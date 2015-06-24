@@ -57,7 +57,7 @@ cm <- ConnectionManager({
 The *setBlinkUpBehavior* method changes the class' BlinkUp behavior (see blinkupBehavior flags above).
 
 ```squirrel
-cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNET);
+cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNECT);
 ```
 
 ## isConnected()
