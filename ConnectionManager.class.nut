@@ -1,3 +1,7 @@
+// Copyright (c) 2015 Electric Imp
+// This file is licensed under the MIT License
+// http://opensource.org/licenses/MIT
+
 class ConnectionManager {
     static version = [1,0,0];
 
@@ -118,7 +122,7 @@ class ConnectionManager {
     // Disconnects, and runs the onDisconnected handler
     function disconnect() {
         // If we're connecting / disconnecting, try again in 0.5 seconds
-        if (_connecting) { return false };
+        if (_connecting) { return false; }
 
         // if we're already disconnected: invoke the onDisconnectedFlow and return
         if (!_connected) {
