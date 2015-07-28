@@ -12,7 +12,7 @@ You can view the library's source code on [GitHub](https://github.com/electricim
 
 ### Constructor: ConnectionManager(*[settings]*)
 
-The ConnectionManager class can be instantiated with an optional table of settings that modify it's behaviour. The following settings are available: 
+The ConnectionManager class can be instantiated with an optional table of settings that modify its behaviour. The following settings are available: 
 
 | key               | default             | notes |
 | ----------------- | ------------------- | ----- |
