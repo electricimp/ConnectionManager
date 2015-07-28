@@ -122,7 +122,7 @@ class ConnectionManager {
     // Disconnects, and runs the onDisconnected handler
     function disconnect() {
         // If we're connecting / disconnecting, try again in 0.5 seconds
-        if (_connecting) { return false };
+        if (_connecting) { return false; }
 
         // if we're already disconnected: invoke the onDisconnectedFlow and return
         if (!_connected) {
