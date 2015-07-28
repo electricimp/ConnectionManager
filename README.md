@@ -80,7 +80,7 @@ The *onDisconnect* method assigns a callback method to the onDisconnect event. T
 ```squirrel
 cm.onDisconnect(function(expected) {
     if (expected) {
-        // log a regular message taht we disconnected as expected
+        // log a regular message that we disconnected as expected
         cm.log("Expected Disconnected");
     } else {
         // log an error message that we unexpectedly disconnected
@@ -106,6 +106,8 @@ cm.onConnect(function() {
 
 The *onNextConnect* method queues a task (the callback) to run the next time the device connects. If the imp is already connected, the callback will be invoked immediately.
 
+There is no limit on the number of tasks that can be queued (excluding any memory / time restraints your application may have).
+
 *The callback method takes zero parameters.*
 
 ```squirrel
@@ -114,6 +116,7 @@ function poll() {
     imp.wakeup(60, poll);
 
     // Read the data, and insert the timestamp into the data table
+    // (in this example, we assume sensor.read() returns a table)
     local data = sensor.read();
     data["ts"] <- time();
 
@@ -124,7 +127,7 @@ function poll() {
 }
 ```
 
-**NOTE**: If the imp enters a deepsleep, the task queue is cleared.
+**NOTE**: If the imp enters a deepsleep or performs a coldboot, the task queue is cleared.
 
 ## connectFor(callback)
 
@@ -180,6 +183,8 @@ cm.disconnect();
 ## log(message)
 
 The *log* method will execute a `server.log` command (if connected), or queue the message to be logged on the next connect. Any object that can be passed to `server.log` can be passed to *ConnectionManager.log*.
+
+**NOTE**: The ConnectionManager class stores log/error messages in memory. As such, the ConnectionManager cannot persist log/error messages across deepsleeps and cold boots.
 
 ```squirrel
 cm.onDisconnect(function(expected) {
