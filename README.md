@@ -16,8 +16,8 @@ The ConnectionManager class can be instantiated with an optional table of settin
 
 | key               | default             | notes |
 | ----------------- | ------------------- | ----- |
-| startDisconnected | `false`             | When set to `true` the device immediatly disconnects |
-| stayConnected     | `false`             | When set to `true` the device will agressively attempt to reconnect when disconnected |
+| startDisconnected | `false`             | When set to `true` the device immediately disconnects |
+| stayConnected     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
 | blinkupBehaviour  | BLINK_ON_DISCONNECT | See below |
 | checkTimeout      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
 
@@ -73,7 +73,7 @@ if (!cm.isConnection()) {
 
 ## onDisconnect(callback)
 
-The *onDisconnect* method assigns a callback method to the onDisconnect event. The onDisconnect event will fire everytime the connection state changes from online to offline, or when the ConnectionManager's *disconnect* method is called (even if the device is already disconnected).
+The *onDisconnect* method assigns a callback method to the onDisconnect event. The onDisconnect event will fire every time the connection state changes from online to offline, or when the ConnectionManager's *disconnect* method is called (even if the device is already disconnected).
 
 *The callback method takes a single parameter - `expected` - which is `true`when the onDisconnect event fired due to the ConnectionManager's disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected).*
 
@@ -91,7 +91,7 @@ cm.onDisconnect(function(expected) {
 
 ## onConnect(callback)
 
-The *onConnect* method assigns a callback method to the onConnect event. The onConnect event will fire everytime the connection state changes from offline to online, or when the ConnectionManager's *connect* method is called (even if the device is already connected).
+The *onConnect* method assigns a callback method to the onConnect event. The onConnect event will fire every time the connection state changes from offline to online, or when the ConnectionManager's *connect* method is called (even if the device is already connected).
 
 *The callback method takes zero parameters.*
 
@@ -104,7 +104,7 @@ cm.onConnect(function() {
 
 ## onNextConnect(callback)
 
-The *onNextConnect* method queues a task (the callback) to run the next time the device connects. If the imp is already connected, the callback will be invoked immediatly.
+The *onNextConnect* method queues a task (the callback) to run the next time the device connects. If the imp is already connected, the callback will be invoked immediately.
 
 *The callback method takes zero parameters.*
 
@@ -128,7 +128,7 @@ function poll() {
 
 ## connectFor(callback)
 
-The *connectFor* method tells the imp to connect, run the callback method, then disconnect when complete. If the imp is already connected, the callback will be invoked immedaitly (and the imp will disconnect upon completion).
+The *connectFor* method tells the imp to connect, run the callback method, then disconnect when complete. If the imp is already connected, the callback will be invoked immediately (and the imp will disconnect upon completion).
 
 *The callback method takes zero parameters.*
 
@@ -202,3 +202,4 @@ The *log* method will execute a `server.error` command (if connected), or queue 
 # License
 
 The ConnectionManager class is licensed under the [MIT License](https://github.com/electricimp/ConnectionManager/blob/master/LICENSE).
+
