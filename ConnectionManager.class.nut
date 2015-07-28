@@ -191,11 +191,10 @@ class ConnectionManager {
     // Wraps a callback function so it executes, then immediatly
     // disconnects.
     function _connectForCallbackFactory(callback) {
-        local __cm = this;
         return function() {
             callback();
-            __cm.disconnect();
-        };
+            disconnect();
+        }.bindenv(this);
     }
 
     // Watches for changes in connection state, and invokes the
@@ -204,7 +203,7 @@ class ConnectionManager {
         // Schedule _watchdog to run again
         imp.wakeup(_checkTimeout, _watchdog.bindenv(this));
 
-        // Don't asddo anything if we're connecting
+        // Don't do anything if we're connecting
         if (_connecting) return;
 
         // Check if we're connected
@@ -226,8 +225,6 @@ class ConnectionManager {
 
     // Runs whenever we connect or call connect()
     function _onConnectedFlow() {
-        local __cm = this;
-
         // Set the BlinkUp State
         _setBlinkUpState();
 
@@ -242,10 +239,25 @@ class ConnectionManager {
 
         // Run the global onConnected Handler if it exists
         if (_onConnect != null) {
-            imp.wakeup(0, function() { __cm._onConnect(); });
+            imp.wakeup(0, function() { _onConnect(); }.bindenv(this));
         }
 
         _processQueue();
+    }
+
+    // Runs whenever we disconnect, or call disconnect()
+    function _onDisconnectedFlow(expected) {
+        // Set the BlinkUp State
+        _setBlinkUpState();
+
+        // Run the global onDisconnected Handler if it exists
+        if (_onDisconnect != null) {
+            imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
+        }
+
+        if (_stayConnected) {
+            imp.wakeup(0, function() { connect(); }.bindenv(this));
+        }
     }
 
     // Helper function for _onConnectedFlow that processes all the tasks
@@ -254,31 +266,13 @@ class ConnectionManager {
         // If we're done, are connecting/disconnecting, or are disconnected
         if (_queue.len() == 0 || _connecting || !_connected) return;
 
-        local __cm = this;
-        local cb = __cm._queue.remove(0);
+        local cb = _queue.remove(0);
         imp.wakeup(0, function() {
             // Invoke the next queued task
             cb();
             // Do it again!!
-            __cm._processQueue();
-        });
-    }
-
-    // Runs whenever we disconnect, or call disconnect()
-    function _onDisconnectedFlow(expected) {
-        local __cm = this;
-
-        // Set the BlinkUp State
-        _setBlinkUpState();
-
-        // Run the global onDisconnected Handler if it exists
-        if (_onDisconnect != null) {
-            imp.wakeup(0, function() { __cm._onDisconnect(expected); });
-        }
-
-        if (_stayConnected) {
-            imp.wakeup(0, function() { __cm.connect(); });
-        }
+            _processQueue();
+        }.bindenv(this));
     }
 
     // Enables of disables BlinkUp based on _blinkupBehavior and _connected
