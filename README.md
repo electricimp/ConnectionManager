@@ -30,7 +30,12 @@ cm <- ConnectionManager({
     "blinkupBehavior": ConnectionManager.BLINK_ALWAYS,
     "stayConnected": true
 });
+
+// Set the recommended buffer size (see note below)
+imp.setsendbuffersize(8096);
 ```
+
+**NOTE:** We've found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
 
 #### blinkupBehaviour
 

@@ -39,7 +39,6 @@ class ConnectionManager {
 
         // Set the timeout policy + disconnect if required
         server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 0);
-        imp.setsendbuffersize(8096);
 
         // Disconnect if required
         if ("startDisconnected" in settings && settings.startDisconnected) {
