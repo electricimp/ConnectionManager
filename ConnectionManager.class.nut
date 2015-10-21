@@ -248,8 +248,6 @@ class ConnectionManager {
         // Set the BlinkUp State
         _setBlinkUpState();
 
-        ::white.write(1); imp.wakeup(1, function() { ::white.write(0) })
-
         // We have a timeout trying to connect. We need to retry;
         _connecting = false;
         imp.wakeup(0, connect.bindenv(this));
