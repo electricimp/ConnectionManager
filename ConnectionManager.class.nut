@@ -10,6 +10,8 @@ class ConnectionManager {
     static BLINK_NEVER = 1;
     static BLINK_ON_CONNECT = 2;
     static BLINK_ON_DISCONNECT = 3;
+    
+    static CONNECTION_TIMEOUT = 60; // Seconds
 
     // Settings
     _checkTimeout = null;
@@ -211,7 +213,7 @@ class ConnectionManager {
 
         // Don't do anything if we're connecting (unless there is a timeout of course)
         if (_connecting) {
-            if (time() - _connecting >= 60) {
+            if (time() - _connecting >= CONNECTION_TIMEOUT) {
                 _onTimeoutFlow()
             }
             return;
