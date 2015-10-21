@@ -120,6 +120,13 @@ class ConnectionManager {
             }
         }.bindenv(this));
 
+        // Catch a race condition where server.connect() won't throw the callback if its already connected
+        if (server.isconnected()) {
+            _connecting = false;
+            _connected = true;
+            _onConnectedFlow();
+        }
+
         return true;
     }
 
