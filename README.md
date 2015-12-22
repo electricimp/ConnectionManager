@@ -22,7 +22,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 | checkTimeout      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
 
 ```squirrel
-#require "ConnectionManager.class.nut:1.0.0"
+#require "ConnectionManager.class.nut:1.0.1"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically agressively try to reconnect on disconnect
