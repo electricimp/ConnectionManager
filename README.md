@@ -1,24 +1,24 @@
-# ConnectionManager 1.0.0
+# ConnectionManager 1.0.1
 
 The ConnectionManager class is an Electric Imp device side library aimed at simplifying connect and disconnect flows.
 
 **NOTE:** If you are using the ConnectionManager class in your model, you should ensure that you are *never* calling `server.connect` or `server.disconnect` in your application code (instead you should use the ConnectionManager's `connect` and `disconnect` methods).
 
-**To add this library to your project, add `#require "ConnectionManager.class.nut:1.0.0"` to the top of your device code.**
+**To add this library to your project, add `#require "ConnectionManager.class.nut:1.0.1"` to the top of your device code.**
 
-You can view the library's source code on [GitHub](https://github.com/electricimp/connectionmanager/tree/v1.0.0).
+You can view the library's source code on [GitHub](https://github.com/electricimp/connectionmanager/tree/v1.0.1).
 
 ## Class Usage
 
 ### Constructor: ConnectionManager(*[settings]*)
 
-The ConnectionManager class can be instantiated with an optional table of settings that modify its behaviour. The following settings are available: 
+The ConnectionManager class can be instantiated with an optional table of settings that modify its behavior. The following settings are available:
 
 | key               | default             | notes |
 | ----------------- | ------------------- | ----- |
 | startDisconnected | `false`             | When set to `true` the device immediately disconnects |
 | stayConnected     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
-| blinkupBehaviour  | BLINK_ON_DISCONNECT | See below |
+| blinkupBehavior  | BLINK_ON_DISCONNECT | See below |
 | checkTimeout      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
 
 ```squirrel
@@ -37,19 +37,19 @@ imp.setsendbuffersize(8096);
 
 **NOTE:** We've found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
 
-#### blinkupBehaviour
+#### blinkupBehavior
 
 **Default Value:** `ConnectionManager.BLINK_ON_DISCONNECT`
 **Values:** `BLINK_ON_DISCONNECT` | `BLINK_ON_CONNECT` | `BLINK_ALWAYS` | `BLINK_NEVER`
 
-The blinkupBehaviour flag modifies when the ConnectionManager enables the BlinkUp circuit (using [imp.enableblinkup](http://electricimp.com/docs/api/imp/enableblinkup):
+The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp circuit (using [imp.enableblinkup](http://electricimp.com/docs/api/imp/enableblinkup):
 
 - `ConnectionManager.BLINK_ON_DISCONNECT` will enable BlinkUp while the imp is disconnected.
 - `ConnectionManager.BLINK_ON_CONNECT` will enable BlinkUp while the imp is connected.
 - `ConnectionManager.BLINK_ALWAYS` will ensure the BlinkUp circuit is always active.
 - `ConnectionManager.BLINK_NEVER` will ensure the BlinkUp circuit is never active.
 
-**NOTE:** The impOS **always** enables the BlinkUp circuit for the first 60 seconds after a coldboot to ensure the imp never enters an unrecoverable state. As a result, regardless of what blinkupBehavior flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a coldboot.
+**NOTE:** The impOS **always** enables the BlinkUp circuit for the first 60 seconds after a coldboot or a successful blinkup to ensure the imp never enters an unrecoverable state. As a result, regardless of what blinkupBehavior flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a coldboot or a successful blinkup.
 
 ## Class Methods
 
@@ -86,7 +86,7 @@ The *onDisconnect* method assigns a callback method to the onDisconnect event. T
 cm.onDisconnect(function(expected) {
     if (expected) {
         // log a regular message that we disconnected as expected
-        cm.log("Expected Disconnected");
+        cm.log("Expected Disconnect");
     } else {
         // log an error message that we unexpectedly disconnected
         cm.error("Unexpected Disconnect");
@@ -194,8 +194,8 @@ The *log* method will execute a `server.log` command (if connected), or queue th
 ```squirrel
 cm.onDisconnect(function(expected) {
     if (expected) {
-        // log a regular message taht we disconnected as expected
-        cm.log("Expected Disconnected");
+        // log a regular message that we disconnected as expected
+        cm.log("Expected Disconnect");
     } else {
         // log an error message that we unexpectedly disconnected
         cm.error("Unexpected Disconnect");
