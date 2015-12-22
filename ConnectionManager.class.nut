@@ -1,14 +1,17 @@
+
 // Copyright (c) 2015 Electric Imp
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
 
 class ConnectionManager {
-    static version = [1,0,0];
+    static version = [1,0,1];
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
     static BLINK_ON_CONNECT = 2;
     static BLINK_ON_DISCONNECT = 3;
+
+    static CONNECTION_TIMEOUT = 60; // Seconds
 
     // Settings
     _checkTimeout = null;
@@ -32,6 +35,7 @@ class ConnectionManager {
         _checkTimeout = ("checkTimeout" in settings) ? settings.checkTimeout : 5;
         _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
         _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
+        local startDisconnected = ("startDisconnected" in settings) ? settings.startDisconnected : false;
 
         // Initialize the onConnected task queue and logs
         _queue = [];
@@ -41,12 +45,12 @@ class ConnectionManager {
         server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 0);
 
         // Disconnect if required
-        if ("startDisconnected" in settings && settings.startDisconnected) {
+        if (startDisconnected) {
             server.disconnect();
+            _connected = false;
         }
 
         // Get the initial state and set BlinkUp accordingly
-        _connected = server.isconnected();
         _setBlinkUpState();
 
         // Start the watchdog
@@ -102,7 +106,7 @@ class ConnectionManager {
         // Otherwise, try to connect...
 
         // Set the _connecting flag at the start
-        _connecting = true;
+        _connecting = time();
         server.connect(function(result) {
             // clear connecting falg when we're done trying to connect
             _connecting = false;
@@ -111,9 +115,17 @@ class ConnectionManager {
                 _connected = true;
                 _onConnectedFlow();
             } else {
-                // Otherwise, do nothing.. _watchdog will pick it up if required
+                // Otherwise, restart the connection process
+                _onTimeoutFlow();
             }
         }.bindenv(this));
+
+        // Catch a race condition where server.connect() won't throw the callback if its already connected
+        if (server.isconnected()) {
+            _connecting = false;
+            _connected = true;
+            _onConnectedFlow();
+        }
 
         return true;
     }
@@ -132,9 +144,9 @@ class ConnectionManager {
         // Disconnect
         server.flush(30);
         server.disconnect();
+
         // Set the flag
         _connected = false;
-        _connecting = false;
 
         // Run the onDisconnectedFlow
         _onDisconnectedFlow(true);
@@ -164,13 +176,13 @@ class ConnectionManager {
         connect();
     }
 
-    // Sets the BlinkUp behaviour to one of the preconfigured options
+    // Sets the BlinkUp behavior to one of the preconfigured options
     //
     // Parameters:
-    //      state:      BLINK_ALWAYS | BLINK_NEVER | BLINK_ON_CONNECTED | BLINK_ON_DISCONNECTED
+    //      state:      BLINK_ALWAYS | BLINK_NEVER | BLINK_ON_CONNECT | BLINK_ON_DISCONNECT
     //
     // Returns:         this
-    function setBlinkUpBehaviour(state) {
+    function setBlinkUpBehavior(state) {
         _blinkupBehavior = state;
         _setBlinkUpState();
 
@@ -206,8 +218,13 @@ class ConnectionManager {
         // Schedule _watchdog to run again
         imp.wakeup(_checkTimeout, _watchdog.bindenv(this));
 
-        // Don't do anything if we're connecting
-        if (_connecting) return;
+        // Don't do anything if we're connecting (unless there is a timeout of course)
+        if (_connecting) {
+            if (time() - _connecting >= CONNECTION_TIMEOUT) {
+                _onTimeoutFlow()
+            }
+            return;
+        }
 
         // Check if we're connected
         local connected = server.isconnected()
@@ -225,6 +242,17 @@ class ConnectionManager {
             _onDisconnectedFlow(false);
         }
     }
+
+    // Runs whenever a call to connect times out
+    function _onTimeoutFlow() {
+        // Set the BlinkUp State
+        _setBlinkUpState();
+
+        // We have a timeout trying to connect. We need to retry;
+        _connecting = false;
+        imp.wakeup(0, connect.bindenv(this));
+    }
+
 
     // Runs whenever we connect or call connect()
     function _onConnectedFlow() {
@@ -259,7 +287,7 @@ class ConnectionManager {
         }
 
         if (_stayConnected) {
-            imp.wakeup(0, function() { connect(); }.bindenv(this));
+            imp.wakeup(0, connect.bindenv(this));
         }
     }
 
