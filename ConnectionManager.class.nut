@@ -10,7 +10,7 @@ class ConnectionManager {
     static BLINK_NEVER = 1;
     static BLINK_ON_CONNECT = 2;
     static BLINK_ON_DISCONNECT = 3;
-    
+
     static CONNECTION_TIMEOUT = 60; // Seconds
 
     // Settings
@@ -48,7 +48,7 @@ class ConnectionManager {
         if (startDisconnected) {
             server.disconnect();
             _connected = false;
-        } 
+        }
 
         // Get the initial state and set BlinkUp accordingly
         _setBlinkUpState();
@@ -176,13 +176,13 @@ class ConnectionManager {
         connect();
     }
 
-    // Sets the BlinkUp behaviour to one of the preconfigured options
+    // Sets the BlinkUp behavior to one of the preconfigured options
     //
     // Parameters:
-    //      state:      BLINK_ALWAYS | BLINK_NEVER | BLINK_ON_CONNECTED | BLINK_ON_DISCONNECTED
+    //      state:      BLINK_ALWAYS | BLINK_NEVER | BLINK_ON_CONNECT | BLINK_ON_DISCONNECT
     //
     // Returns:         this
-    function setBlinkUpBehaviour(state) {
+    function setBlinkUpBehavior(state) {
         _blinkupBehavior = state;
         _setBlinkUpState();
 
@@ -252,8 +252,8 @@ class ConnectionManager {
         _connecting = false;
         imp.wakeup(0, connect.bindenv(this));
     }
-    
-    
+
+
     // Runs whenever we connect or call connect()
     function _onConnectedFlow() {
         // Set the BlinkUp State
