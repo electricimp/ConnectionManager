@@ -20,6 +20,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 | stayConnected     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
 | blinkupBehavior  | BLINK_ON_DISCONNECT | See below |
 | checkTimeout      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
+| ackTimeout | 1 | Float, seconds. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. |
 
 ```squirrel
 #require "ConnectionManager.class.nut:1.0.1"

@@ -36,13 +36,14 @@ class ConnectionManager {
         _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
         _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
         local startDisconnected = ("startDisconnected" in settings) ? settings.startDisconnected : false;
+        local ackTimeout = ("ackTimeout" in settings) ? settings.ackTimeout : 1;
 
         // Initialize the onConnected task queue and logs
         _queue = [];
         _logs = [];
 
         // Set the timeout policy + disconnect if required
-        server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 0);
+        server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
 
         // Disconnect if required
         if (startDisconnected) {
