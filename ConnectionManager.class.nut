@@ -4,7 +4,7 @@
 // http://opensource.org/licenses/MIT
 
 class ConnectionManager {
-    static version = [1,0,1];
+    static version = [1,0,2];
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
