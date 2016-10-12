@@ -83,7 +83,7 @@ The *onDisconnect* method assigns a callback method to the onDisconnect event. T
 
 | name              | description |
 | ----------------- | ----- |
-| expected | A boolean value, which is `true` when the onDisconnect event fired due to the ConnectionManager's disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected) |
+| expected | is `true`when the onDisconnect event fired due to the ConnectionManager's disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected) |
 | reason   | Integer value, specifying the reason why the imp disconnected if known, otherwise NOT_CONNECTED |
 
 The reason parameter is an integer into which a constant specifying the reason for the disconnection, whether known or not, will be passed:
