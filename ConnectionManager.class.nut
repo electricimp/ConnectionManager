@@ -4,7 +4,7 @@
 // http://opensource.org/licenses/MIT
 
 class ConnectionManager {
-    static version = [1,0,1];
+    static version = [1,0,2];
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
@@ -36,13 +36,14 @@ class ConnectionManager {
         _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
         _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
         local startDisconnected = ("startDisconnected" in settings) ? settings.startDisconnected : false;
+        local ackTimeout = ("ackTimeout" in settings) ? settings.ackTimeout : 1;
 
         // Initialize the onConnected task queue and logs
         _queue = [];
         _logs = [];
 
         // Set the timeout policy + disconnect if required
-        server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 0);
+        server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
 
         // Disconnect if required
         if (startDisconnected) {
@@ -100,7 +101,7 @@ class ConnectionManager {
         // If we're already connected: invoke the onConnectedFlow and return
         if (_connected) {
             _onConnectedFlow();
-            return true;;
+            return true;
         }
 
         // Otherwise, try to connect...
@@ -108,7 +109,7 @@ class ConnectionManager {
         // Set the _connecting flag at the start
         _connecting = time();
         server.connect(function(result) {
-            // clear connecting falg when we're done trying to connect
+            // clear connecting flag when we're done trying to connect
             _connecting = false;
             if (result == SERVER_CONNECTED) {
                 // If it worked, run the onConnectedFlow
@@ -191,9 +192,13 @@ class ConnectionManager {
 
     function log(obj, error = false) {
         if (_connected) {
-            server.log(obj.tostring());
+            if (error) {
+                server.error(obj.tostring());
+            } else {
+                server.log(obj.tostring());
+            }
         } else {
-            _logs.push({ "ts": time(), "error": 0, "log": obj.tostring() });
+            _logs.push({ "ts": time(), "error": error, "log": obj.tostring() });
         }
     }
 
