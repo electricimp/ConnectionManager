@@ -81,36 +81,16 @@ if (!cm.isConnection()) {
 
 The *onDisconnect* method assigns a callback method to the onDisconnect event. The onDisconnect event will fire every time the connection state changes from online to offline, or when the ConnectionManager's *disconnect* method is called (even if the device is already disconnected).
 
-| name              | description |
-| ----------------- | ----- |
-| expected | is `true`when the onDisconnect event fired due to the ConnectionManager's disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected) |
-| reason   | Integer value, specifying the reason why the imp disconnected if known, otherwise NOT_CONNECTED |
-
-The reason parameter is an integer into which a constant specifying the reason for the disconnection, whether known or not, will be passed:
-
-| Constant  |  Value  | Description |
-| --------- | ------- | ----------- |
-| NO_WIFI | 1  | Failed to join WiFi |
-| NO_LINK | 1  | Failed to join Ethernet. From impOS™ release 34. imp005 only |
-| NO_IP_ADDRESS | 2 | Failed to get an IP address |
-| NOT_RESOLVED  | 3 | The IP address of an Electric Imp server or proxy could not be resolved |
-| NO_SERVER  | 4 |  Failed to connect to the Electric Imp server |
-| SERVER_CONNECTED | 5 | The server is connected |
-| NO_PROXY | 6 | The imp cannot connect via saved proxy address and port. From impOS release 33 |
-| NOT_AUTHORISED | 7 | The imp cannot connect because its proxy access credentials have been rejected. From impOS release 33 |
-| NOT_CONNECTED | 0 | The imp is not able to connect for some other reason |
-
-*The values assigned to the constants may change in a future impOS release.*
-
+*The callback method takes a single parameter - `expected` - which is `true`when the onDisconnect event fired due to the ConnectionManager's disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected).*
 
 ```squirrel
-cm.onDisconnect(function(expected, reason) {
+cm.onDisconnect(function(expected) {
     if (expected) {
         // log a regular message that we disconnected as expected
         cm.log("Expected Disconnect");
     } else {
         // log an error message that we unexpectedly disconnected
-        cm.error("Unexpected Disconnect: " + reason);
+        cm.error("Unexpected Disconnect");
     }
 });
 ```
