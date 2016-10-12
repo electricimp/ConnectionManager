@@ -4,7 +4,7 @@
 // http://opensource.org/licenses/MIT
 
 class ConnectionManager {
-    static version = [1,0,2];
+    static version = [2,0,0];
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
@@ -30,6 +30,9 @@ class ConnectionManager {
     _queue = null;
     _logs = null;
 
+    // Last disconnection error
+    _lastConnectionStatus = null;
+
     constructor(settings = {}) {
         // Grab settings
         _checkTimeout = ("checkTimeout" in settings) ? settings.checkTimeout : 5;
@@ -45,6 +48,9 @@ class ConnectionManager {
         // Set the timeout policy + disconnect if required
         server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
 
+        // Set the onunexpecteddisconnect handler to listen to the actual disconnect reason
+        server.onunexpecteddisconnect(_onUnexpectedDisconnect.bindenv(this));
+
         // Disconnect if required
         if (startDisconnected) {
             server.disconnect();
@@ -56,6 +62,10 @@ class ConnectionManager {
 
         // Start the watchdog
         _watchdog();
+    }
+
+    function _onUnexpectedDisconnect(reason) {
+        _lastConnectionStatus = reason;
     }
 
     // Sets an onConnect handler that fires everytime we connect. Passing
@@ -109,6 +119,8 @@ class ConnectionManager {
         // Set the _connecting flag at the start
         _connecting = time();
         server.connect(function(result) {
+            // update last connection status flag
+            _lastConnectionStatus = result;
             // clear connecting flag when we're done trying to connect
             _connecting = false;
             if (result == SERVER_CONNECTED) {
@@ -125,6 +137,7 @@ class ConnectionManager {
         if (server.isconnected()) {
             _connecting = false;
             _connected = true;
+            _lastConnectionStatus = SERVER_CONNECTED;
             _onConnectedFlow();
         }
 
@@ -135,6 +148,9 @@ class ConnectionManager {
     function disconnect() {
         // If we're connecting / disconnecting, try again in 0.5 seconds
         if (_connecting) { return false; }
+
+        // Update the latest connection status
+        _lastConnectionStatus = NOT_CONNECTED;
 
         // if we're already disconnected: invoke the onDisconnectedFlow and return
         if (!_connected) {
@@ -288,7 +304,7 @@ class ConnectionManager {
 
         // Run the global onDisconnected Handler if it exists
         if (_onDisconnect != null) {
-            imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
+            imp.wakeup(0, function() { _onDisconnect(expected, _lastConnectionStatus); }.bindenv(this));
         }
 
         if (_stayConnected) {
