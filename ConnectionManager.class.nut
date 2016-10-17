@@ -1,25 +1,27 @@
-
-// Copyright (c) 2015 Electric Imp
+// Copyright (c) 2015-2016 Electric Imp
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
 
 class ConnectionManager {
-    static version = [1,0,2];
+    static version = [1,1,0];
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
     static BLINK_ON_CONNECT = 2;
     static BLINK_ON_DISCONNECT = 3;
 
-    static CONNECTION_TIMEOUT = 60; // Seconds
+    static FLUSH_TIMEOUT = 30;
 
     // Settings
+    _connectTimeout = null;
     _checkTimeout = null;
     _stayConnected = null;
     _blinkupBehavior = null;
+	_retryOnTimeout = null;
 
     // Global Handlers
     _onConnect = null;
+	_onTimeout = null;
     _onDisconnect = null;
 
     // Connection State
@@ -33,9 +35,12 @@ class ConnectionManager {
     constructor(settings = {}) {
         // Grab settings
         _checkTimeout = ("checkTimeout" in settings) ? settings.checkTimeout : 5;
+        _connectTimeout = ("connectTimeout" in settings) ? settings.connectTimeout : 60;
         _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
         _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
+		_retryOnTimeout = ("retryOnTimeout" in settings) ? settings.retryOnTimeout : true;
         local startDisconnected = ("startDisconnected" in settings) ? settings.startDisconnected : false;
+        local startConnected = ("startConnected" in settings) ? settings.startConnected : false;
         local ackTimeout = ("ackTimeout" in settings) ? settings.ackTimeout : 1;
 
         // Initialize the onConnected task queue and logs
@@ -45,10 +50,13 @@ class ConnectionManager {
         // Set the timeout policy + disconnect if required
         server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
 
-        // Disconnect if required
         if (startDisconnected) {
+            // Disconnect if required
             server.disconnect();
             _connected = false;
+        } else if (startConnected) {
+            // Start connecting if they ask for it
+            imp.wakeup(0, connect.bindenv(this));
         }
 
         // Get the initial state and set BlinkUp accordingly
@@ -56,6 +64,7 @@ class ConnectionManager {
 
         // Start the watchdog
         _watchdog();
+
     }
 
     // Sets an onConnect handler that fires everytime we connect. Passing
@@ -70,6 +79,19 @@ class ConnectionManager {
 
         return this;
     }
+
+    // Sets an onTimeout handler that fires when a connection attempt fails. Passing
+    // null to this function removes the onTimeout handler
+    //
+    // Parameters:
+    //      callback:   The onTimeout handler (no parameters)
+    //
+    // Returns:         this
+	function onTimeout(callback) {
+		_onTimeout = callback;
+
+		return this;
+	}
 
     // Sets a onDisconnect handler that fires everytime we disconnect. Passing
     // null to this function removes the onDisconnect handler
@@ -95,6 +117,7 @@ class ConnectionManager {
     // connection attempt was successful, run the onConnect handler, and
     // any other onConnected tasks
     function connect() {
+
         // If we're connecting/disconnecting, try again in 0.5 seconds
         if (_connecting) return false;
 
@@ -107,8 +130,9 @@ class ConnectionManager {
         // Otherwise, try to connect...
 
         // Set the _connecting flag at the start
-        _connecting = time();
+        _connecting = hardware.millis();
         server.connect(function(result) {
+
             // clear connecting flag when we're done trying to connect
             _connecting = false;
             if (result == SERVER_CONNECTED) {
@@ -119,7 +143,7 @@ class ConnectionManager {
                 // Otherwise, restart the connection process
                 _onTimeoutFlow();
             }
-        }.bindenv(this));
+        }.bindenv(this), _connectTimeout);
 
         // Catch a race condition where server.connect() won't throw the callback if its already connected
         if (server.isconnected()) {
@@ -143,7 +167,7 @@ class ConnectionManager {
         }
 
         // Disconnect
-        server.flush(30);
+        server.flush(FLUSH_TIMEOUT);
         server.disconnect();
 
         // Set the flag
@@ -220,12 +244,13 @@ class ConnectionManager {
     // Watches for changes in connection state, and invokes the
     // onConnectedFlow and onDisconnectedFlow where appropriate
     function _watchdog() {
+
         // Schedule _watchdog to run again
         imp.wakeup(_checkTimeout, _watchdog.bindenv(this));
 
         // Don't do anything if we're connecting (unless there is a timeout of course)
         if (_connecting) {
-            if (time() - _connecting >= CONNECTION_TIMEOUT) {
+            if (hardware.millis() - _connecting > (_connectTimeout*1000)) {
                 _onTimeoutFlow()
             }
             return;
@@ -248,19 +273,9 @@ class ConnectionManager {
         }
     }
 
-    // Runs whenever a call to connect times out
-    function _onTimeoutFlow() {
-        // Set the BlinkUp State
-        _setBlinkUpState();
-
-        // We have a timeout trying to connect. We need to retry;
-        _connecting = false;
-        imp.wakeup(0, connect.bindenv(this));
-    }
-
-
     // Runs whenever we connect or call connect()
     function _onConnectedFlow() {
+
         // Set the BlinkUp State
         _setBlinkUpState();
 
@@ -274,27 +289,45 @@ class ConnectionManager {
         }
 
         // Run the global onConnected Handler if it exists
-        if (_onConnect != null) {
-            imp.wakeup(0, function() { _onConnect(); }.bindenv(this));
-        }
+        if (_onConnect) imp.wakeup(0, function() { _onConnect(); }.bindenv(this));
 
         _processQueue();
     }
 
     // Runs whenever we disconnect, or call disconnect()
     function _onDisconnectedFlow(expected) {
+
         // Set the BlinkUp State
         _setBlinkUpState();
 
         // Run the global onDisconnected Handler if it exists
-        if (_onDisconnect != null) {
-            imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
-        }
+        if (_onDisconnect) imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
 
         if (_stayConnected) {
             imp.wakeup(0, connect.bindenv(this));
+        } else {
+            // Brutally stop trying to connect
+            server.disconnect();
         }
     }
+
+
+    // Runs whenever a call to connect times out
+    function _onTimeoutFlow() {
+
+        // Set the BlinkUp State
+        _setBlinkUpState();
+
+		_connecting = false;
+		_connected = false;
+        if (_onTimeout) imp.wakeup(0, function() { _onTimeout(); }.bindenv(this));
+
+		if (_retryOnTimeout) {
+			// We have a timeout trying to connect. We need to retry;
+			imp.wakeup(0, connect.bindenv(this));
+		}
+    }
+
 
     // Helper function for _onConnectedFlow that processes all the tasks
     // in the onConnected _queue or quits once we're no longer connected
