@@ -1,10 +1,12 @@
-# ConnectionManager 1.0.1
+# ConnectionManager 1.1.0
 
-The ConnectionManager class is an Electric Imp device-side library aimed at simplifying connect and disconnect flows.
+The ConnectionManager class is an Electric Imp device side library aimed at simplifying connect and disconnect flows.
 
-**Note** If you are using the ConnectionManager class in your model, you should ensure that you *never* call  [**server.connect()**](https://electricimp.com/docs/api/server/connect/) or [**server.disconnect()**](https://electricimp.com/docs/api/server/disconnect/) in your application code. Instead you should use the ConnectionManager’s *connect()* and *disconnect()* methods.
+**NOTE:** If you are using the ConnectionManager class in your model, you should ensure that you are *never* calling `server.connect` or `server.disconnect` in your application code (instead you should use the ConnectionManager's `connect` and `disconnect` methods).
 
-**To add this library to your project, add** `#require "ConnectionManager.class.nut:1.0.1"` **to the top of your device code.**
+**To add this library to your project, add `#require "ConnectionManager.class.nut:1.1.0"` to the top of your device code.**
+
+You can view the library's source code on [GitHub](https://github.com/electricimp/connectionmanager/tree/v1.1.0).
 
 ## Class Usage
 
@@ -12,16 +14,19 @@ The ConnectionManager class is an Electric Imp device-side library aimed at simp
 
 The ConnectionManager class can be instantiated with an optional table of settings that modify its behavior. The following settings are available:
 
-| Key               | Default Value       | Notes |
+| key               | default             | notes |
 | ----------------- | ------------------- | ----- |
-| *startDisconnected* | `false`             | When set to `true` the device immediately disconnects |
-| *stayConnected*     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
-| *blinkupBehavior*   | BLINK_ON_DISCONNECT | See below |
-| *checkTimeout*      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline) |
-| *ackTimeout*        | 1 | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data |
+| startConnected    | `false`             | When set to `true` the device immediately connects |
+| startDisconnected | `false`             | When set to `true` the device immediately disconnects |
+| stayConnected     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
+| retryOnTimeout    | `true`              | When set to `true` the device will attempt to connect again if it times out. |
+| blinkupBehavior   | BLINK_ON_DISCONNECT | See below |
+| checkTimeout      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
+| connectTimeout    | 60                  | Float, seconds. Maximum time (in seconds) allowed for the imp to connect to the server before timing out. |
+| ackTimeout        | 1                   | Float, seconds. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. |
 
 ```squirrel
-#require "ConnectionManager.class.nut:1.0.1"
+#require "ConnectionManager.class.nut:1.1.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically agressively try to reconnect on disconnect
@@ -34,27 +39,27 @@ cm <- ConnectionManager({
 imp.setsendbuffersize(8096);
 ```
 
-**Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
+**NOTE:** We've found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
 
 #### blinkupBehavior
 
-**Values** *ConnectionManager.BLINK_ON_DISCONNECT*, *ConnectionManager.BLINK_ON_CONNECT*, *ConnectionManager.BLINK_ALWAYS*, *ConnectionManager.BLINK_NEVER*
-**Default** *ConnectionManager.BLINK_ON_DISCONNECT*
+**Default Value:** `ConnectionManager.BLINK_ON_DISCONNECT`
+**Values:** `BLINK_ON_DISCONNECT` | `BLINK_ON_CONNECT` | `BLINK_ALWAYS` | `BLINK_NEVER`
 
-The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp circuit (using [**imp.enableblinkup()**](http://electricimp.com/docs/api/imp/enableblinkup):
+The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp circuit (using [imp.enableblinkup](http://electricimp.com/docs/api/imp/enableblinkup):
 
-- *ConnectionManager.BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected.
-- *ConnectionManager.BLINK_ON_CONNECT* will enable BlinkUp while the imp is connected.
-- *ConnectionManager.BLINK_ALWAYS* will ensure the BlinkUp circuit is always active.
-- *ConnectionManager.BLINK_NEVER* will ensure the BlinkUp circuit is never active.
+- `ConnectionManager.BLINK_ON_DISCONNECT` will enable BlinkUp while the imp is disconnected.
+- `ConnectionManager.BLINK_ON_CONNECT` will enable BlinkUp while the imp is connected.
+- `ConnectionManager.BLINK_ALWAYS` will ensure the BlinkUp circuit is always active.
+- `ConnectionManager.BLINK_NEVER` will ensure the BlinkUp circuit is never active.
 
-**Note** impOS *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot.
+**NOTE:** The impOS **always** enables the BlinkUp circuit for the first 60 seconds after a coldboot or a successful blinkup to ensure the imp never enters an unrecoverable state. As a result, regardless of what blinkupBehavior flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a coldboot or a successful blinkup.
 
 ## Class Methods
 
-### setBlinkUpBehavior(*blinkupBehaviorFlag*)
+## setBlinkUpBehavior(blinkupBehaviorFlag)
 
-The *setBlinkUpBehavior()* method changes the class’ BlinkUp behavior (see [blinkupBehavior flags](#blinkupbehavior), above).
+The *setBlinkUpBehavior* method changes the class' BlinkUp behavior (see blinkupBehavior flags above).
 
 ```squirrel
 // Set ConnectionManager to enable BlinkUp only while it's connected
@@ -63,7 +68,7 @@ cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNECT);
 
 ## isConnected()
 
-The *isConnected()* method returns the value of ConnectionManager’s internal connected state flag (whether or not we are connected). This flag is updated every five seconds, or as set by the *checkTimeout* setting in the constructor.
+The *isConnected* method returns the value of ConnectionManager's internal connected state flag (whether or not we are connected). This flag is updated every 5 seconds (or as set by the `checkTimeout` flag in the constructor).
 
 ```squirrel
 if (!cm.isConnection()) {
@@ -75,11 +80,11 @@ if (!cm.isConnection()) {
 }
 ```
 
-## onDisconnect(*callback*)
+## onDisconnect(callback)
 
-The *onDisconnect()* method assigns a callback function to the onDisconnect event. The onDisconnect event will fire every time the connection state changes from online to offline, or when the ConnectionManager’s *disconnect()* method is called (even if the device is already disconnected).
+The *onDisconnect* method assigns a callback method to the onDisconnect event. The onDisconnect event will fire every time the connection state changes from online to offline, or when the ConnectionManager's *disconnect* method is called (even if the device is already disconnected).
 
-The callback method takes a single parameter, *expected*, which is `true` when the onDisconnect event fired due to the ConnectionManager’s disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected).
+*The callback method takes a single parameter - `expected` - which is `true`when the onDisconnect event fired due to the ConnectionManager's disconnect method being called, and `false` otherwise (an unexpected state change from connected to disconnected).*
 
 ```squirrel
 cm.onDisconnect(function(expected) {
@@ -93,11 +98,11 @@ cm.onDisconnect(function(expected) {
 });
 ```
 
-## onConnect(*callback*)
+## onConnect(callback)
 
-The *onConnect()* method assigns a callback method to the onConnect event. The onConnect event will fire every time the connection state changes from offline to online, or when the ConnectionManager’s *connect()* method is called (even if the device is already connected).
+The *onConnect* method assigns a callback method to the onConnect event. The onConnect event will fire every time the connection state changes from offline to online, or when the ConnectionManager's *connect* method is called (even if the device is already connected).
 
-The callback function has no parameters.
+*The callback method takes zero parameters.*
 
 ```squirrel
 cm.onConnect(function() {
@@ -106,13 +111,26 @@ cm.onConnect(function() {
 });
 ```
 
-## onNextConnect(*callback*)
+## onTimeout(callback)
 
-The *onNextConnect()* method queues a task (the callback) to run the next time the device connects. If the imp is already connected, the callback will be invoked immediately.
+The *onTimeout* method assigns a callback method to the onTimeout event. The onTimeout event will fire every time the device attempts to connect but does not succeed.
 
-There is no limit on the number of tasks that can be queued (excluding any memory or time restraints your application may have).
+*The callback method takes zero parameters.*
 
-The callback function has no parameters.
+```squirrel
+cm.onTimeout(function() {
+    // Go to sleep for 10 minutes if the device fails to connect
+    server.sleepfor(600);
+});
+```
+
+## onNextConnect(callback)
+
+The *onNextConnect* method queues a task (the callback) to run the next time the device connects. If the imp is already connected, the callback will be invoked immediately.
+
+There is no limit on the number of tasks that can be queued (excluding any memory / time restraints your application may have).
+
+*The callback method takes zero parameters.*
 
 ```squirrel
 function poll() {
@@ -131,13 +149,13 @@ function poll() {
 }
 ```
 
-**Note** If the imp enters a deep sleep or performs a cold boot, the task queue will be cleared.
+**NOTE**: If the imp enters a deepsleep or performs a coldboot, the task queue is cleared.
 
-## connectFor(*callback*)
+## connectFor(callback)
 
-The *connectFor()* method tells the imp to connect, run the callback method, then disconnect when complete. If the imp is already connected, the callback will be invoked immediately, and the imp will disconnect upon completion.
+The *connectFor* method tells the imp to connect, run the callback method, then disconnect when complete. If the imp is already connected, the callback will be invoked immediately (and the imp will disconnect upon completion). Note that this callback function should be synchronous or the Imp may disconnect earlier than expected.
 
-The callback function has no parameters.
+*The callback method takes zero parameters.*
 
 ```squirrel
 function poll() {
@@ -153,64 +171,61 @@ function poll() {
 }
 ```
 
-**Note** The *connectFor()* method is equivalent to:
+**NOTE:** The connectFor method is equivalent to:
 
 ```squirrel
 cm.onNextConnect(function() {
-    // Do something
+    // do something
     ...
 
     cm.disconnect();
 }).connect();
 ```
 
-### connect()
+## connect()
 
-The *connect()* method tells ConnectionManager to attempt to connect to the server. If it successfully connects (or is already connected), ConnectionManager will execute the registered onConnect callback, perform any tasks queued from onNextConnect, and log all offline log messages (from *ConnectionManager.log()* and *ConnectionManager.error()*).
+The *connect* method tells the ConnectionManager to attempt to connect to the server. If it successfully connects (or is already connected), the ConnectionManager will execute the *ConnectionManager.onConnect* callback, any tasks queued from onNextConnect, as well as log all offline log messages (from ConnectionManager.log and ConnectionManager.error).
 
-If a connect is already in process, the connect method will return `false` and won’t attempt to connect or invoke any callbacks, otherwise it returns `true`.
+If a connect is already in process, the connect method will return `false` (and won't attempt to connect or invoke any callbacks), otherwise it returns `true`.
 
 ```squirrel
 cm.connect();
 ```
 
-### disconnect()
+## disconnect()
 
-The *disconnect()* method tells ConnectionManager to attempt to disconnect from the server. If it successfully disconnects (or is already disconnected), the ConnectionManager will execute the registered onDisconnect callback, if there is one.
+The *disconnect* method tells the ConnectionManager to attempt to disconnect from the server. If it successfully disconnects (or is already disconnected), the ConnectionManager will execute the *ConnectionManager.onDisconnect* callback.
 
-If a connect is in process, the disconnect method will return `false` and won’t attempt to disconnect or invoke any callbacks, otherwise it returns `true`.
+If a connect is in process, the disconnect method will return `false` (and won't attempt to disconnect or invoke any callbacks), otherwise it returns `true`.
 
 ```
 cm.disconnect();
 ```
 
-### log(*message*)
+## log(message)
 
-The *log()* method will execute a [**server.log()**](/docs/api/server/log/) command (if connected), or queue the value of *message* to be logged on the next connect. Any object that can be passed to [**server.log()**](/docs/api/server/log/) can be passed to *log()*.
+The *log* method will execute a `server.log` command (if connected), or queue the message to be logged on the next connect. Any object that can be passed to `server.log` can be passed to *ConnectionManager.log*.
 
-**Note** The ConnectionManager class stores log messages in memory but doesn’t persist log messages across deep sleeps and cold boots.
+**NOTE**: The ConnectionManager class stores log/error messages in memory. As such, the ConnectionManager cannot persist log/error messages across deepsleeps and cold boots.
 
 ```squirrel
 cm.onDisconnect(function(expected) {
     if (expected) {
-        // Log a regular message that we disconnected as expected
+        // log a regular message that we disconnected as expected
         cm.log("Expected Disconnect");
     } else {
-        // Log an error message that we unexpectedly disconnected
+        // log an error message that we unexpectedly disconnected
         cm.error("Unexpected Disconnect");
     }
 });
 ```
 
-### error(*message*)
+## error(message)
 
-The *error()* method will execute a [**server.error()**](/docs/api/server/error/) command (if connected), or queue the value of *errorMessage* to be logged on the next connect. Any object that can be passed to [**server.error()**](/docs/api/server/error/) can be passed to *error()*.
+The *log* method will execute a `server.error` command (if connected), or queue the message to be logged (as an error) on the next connect. Any object that can be passed to `server.error` can be passed to ConnectionManager.error.
 
-**Note** The ConnectionManager class stores log messages in memory but doesn’t persist log messages across deep sleeps and cold boots.
+*See log(message) for example.*
 
-See *log()*, above, for example code.
-
-## License
+# License
 
 The ConnectionManager class is licensed under the [MIT License](https://github.com/electricimp/ConnectionManager/blob/master/LICENSE).
-
