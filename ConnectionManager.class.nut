@@ -17,11 +17,11 @@ class ConnectionManager {
     _checkTimeout = null;
     _stayConnected = null;
     _blinkupBehavior = null;
-	_retryOnTimeout = null;
+    _retryOnTimeout = null;
 
     // Global Handlers
     _onConnect = null;
-	_onTimeout = null;
+    _onTimeout = null;
     _onDisconnect = null;
 
     // Connection State
@@ -38,7 +38,7 @@ class ConnectionManager {
         _connectTimeout = ("connectTimeout" in settings) ? settings.connectTimeout : 60;
         _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
         _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
-		_retryOnTimeout = ("retryOnTimeout" in settings) ? settings.retryOnTimeout : true;
+        _retryOnTimeout = ("retryOnTimeout" in settings) ? settings.retryOnTimeout : true;
         local startDisconnected = ("startDisconnected" in settings) ? settings.startDisconnected : false;
         local startConnected = ("startConnected" in settings) ? settings.startConnected : false;
         local ackTimeout = ("ackTimeout" in settings) ? settings.ackTimeout : 1;
@@ -87,11 +87,11 @@ class ConnectionManager {
     //      callback:   The onTimeout handler (no parameters)
     //
     // Returns:         this
-	function onTimeout(callback) {
-		_onTimeout = callback;
+    function onTimeout(callback) {
+        _onTimeout = callback;
 
-		return this;
-	}
+        return this;
+    }
 
     // Sets a onDisconnect handler that fires everytime we disconnect. Passing
     // null to this function removes the onDisconnect handler
@@ -289,7 +289,9 @@ class ConnectionManager {
         }
 
         // Run the global onConnected Handler if it exists
-        if (_onConnect) imp.wakeup(0, function() { _onConnect(); }.bindenv(this));
+        if (_onConnect != null) {
+            imp.wakeup(0, function() { _onConnect(); }.bindenv(this));
+        }
 
         _processQueue();
     }
@@ -301,7 +303,9 @@ class ConnectionManager {
         _setBlinkUpState();
 
         // Run the global onDisconnected Handler if it exists
-        if (_onDisconnect) imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
+        if (_onDisconnect != null) {
+            imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
+        }
 
         if (_stayConnected) {
             imp.wakeup(0, connect.bindenv(this));
@@ -318,14 +322,16 @@ class ConnectionManager {
         // Set the BlinkUp State
         _setBlinkUpState();
 
-		_connecting = false;
-		_connected = false;
-        if (_onTimeout) imp.wakeup(0, function() { _onTimeout(); }.bindenv(this));
+        _connecting = false;
+        _connected = false;
+        if (_onTimeout != null) {
+            imp.wakeup(0, function() { _onTimeout(); }.bindenv(this));
+        }
 
-		if (_retryOnTimeout) {
-			// We have a timeout trying to connect. We need to retry;
-			imp.wakeup(0, connect.bindenv(this));
-		}
+        if (_retryOnTimeout) {
+            // We have a timeout trying to connect. We need to retry;
+            imp.wakeup(0, connect.bindenv(this));
+        }
     }
 
 
