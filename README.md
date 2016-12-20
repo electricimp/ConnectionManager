@@ -66,7 +66,7 @@ cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNECT);
 The *isConnected()* method returns the value of ConnectionManager’s internal connected state flag (whether or not we are connected). This flag is updated every five seconds, or as set by the *checkTimeout* setting in the constructor.
 
 ```squirrel
-if (!cm.isConnection()) {
+if (!cm.isConnected()) {
     // If we're not connected, gather some data, then connect
     cm.onNextConnect(function() {
         local data = sensor.read();
