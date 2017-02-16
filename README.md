@@ -18,7 +18,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 | *stayConnected*     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
 | *blinkupBehavior*   | BLINK_ON_DISCONNECT | See below |
 | *checkTimeout*      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline) |
-| *ackTimeout*        | 1 | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data |
+| *ackTimeout*        | 1 | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. See below |
 
 ```squirrel
 #require "ConnectionManager.class.nut:1.0.2"
@@ -44,7 +44,7 @@ This value is passed into the imp API method [**server.setsendtimeoutpolicy()**]
 
 The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp circuit (using [**imp.enableblinkup()**](http://electricimp.com/docs/api/imp/enableblinkup):
 
-- *ConnectionManager.BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected.
+- *ConnectionManager.BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected. This is the default value.
 - *ConnectionManager.BLINK_ON_CONNECT* will enable BlinkUp while the imp is connected.
 - *ConnectionManager.BLINK_ALWAYS* will ensure the BlinkUp circuit is always active.
 - *ConnectionManager.BLINK_NEVER* will ensure the BlinkUp circuit is never active.
