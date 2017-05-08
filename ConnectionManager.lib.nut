@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2016 Electric Imp
+// Copyright (c) 2015-2017 Electric Imp
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
 
@@ -9,7 +9,6 @@ class ConnectionManager {
     static BLINK_NEVER = 1;
     static BLINK_ON_CONNECT = 2;
     static BLINK_ON_DISCONNECT = 3;
-
     static FLUSH_TIMEOUT = 30;
 
     // Settings
