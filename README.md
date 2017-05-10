@@ -1,10 +1,10 @@
-# ConnectionManager 1.0.2
+# ConnectionManager 1.1.0
 
 The ConnectionManager class is an Electric Imp device-side library aimed at simplifying connect and disconnect flows.
 
 **Note** If you are using the ConnectionManager class in your model, you should ensure that you *never* call  [**server.connect()**](https://electricimp.com/docs/api/server/connect/) or [**server.disconnect()**](https://electricimp.com/docs/api/server/disconnect/) in your application code. Instead you should use the ConnectionManager’s *connect()* and *disconnect()* methods.
 
-**To add this library to your project, add** `#require "ConnectionManager.class.nut:1.0.2"` **to the top of your device code.**
+**To add this library to your project, add** `#require "ConnectionManager.class.nut:1.1.0"` **to the top of your device code.**
 
 ## Class Usage
 
@@ -12,16 +12,19 @@ The ConnectionManager class is an Electric Imp device-side library aimed at simp
 
 The ConnectionManager class can be instantiated with an optional table of settings that modify its behavior. The following settings are available:
 
-| Key               | Default Value       | Notes |
+| key               | default             | notes |
 | ----------------- | ------------------- | ----- |
+| *startConnected*    | `false`             | When set to `true` the device immediately connects |
 | *startDisconnected* | `false`             | When set to `true` the device immediately disconnects |
 | *stayConnected*     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
+| *retryOnTimeout*    | `true`              | When set to `true` the device will attempt to connect again if it times out. |
 | *blinkupBehavior*   | BLINK_ON_DISCONNECT | See below |
-| *checkTimeout*      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline) |
-| *ackTimeout*        | 1 | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. See below |
+| *checkTimeout*      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
+| *connectTimeout*    | 60                  | Float. Maximum time (in seconds) allowed for the imp to connect to the server before timing out. |
+| *ackTimeout*        | 1                   | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. |
 
 ```squirrel
-#require "ConnectionManager.class.nut:1.0.2"
+#require "ConnectionManager.class.nut:1.1.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically agressively try to reconnect on disconnect
@@ -104,6 +107,19 @@ The callback function has no parameters.
 cm.onConnect(function() {
     // Send a message to the agent indicating that we're online
     agent.send("online", true);
+});
+```
+
+## onTimeout(callback)
+
+The *onTimeout* method assigns a callback method to the onTimeout event. The onTimeout event will fire every time the device attempts to connect but does not succeed.
+
+*The callback method takes zero parameters.*
+
+```squirrel
+cm.onTimeout(function() {
+    // Go to sleep for 10 minutes if the device fails to connect
+    server.sleepfor(600);
 });
 ```
 
