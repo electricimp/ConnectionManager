@@ -39,19 +39,20 @@ imp.setsendbuffersize(8096);
 
 **Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
 
-#### blinkupBehavior
+#### ackTimeout
 
-**Values** *ConnectionManager.BLINK_ON_DISCONNECT*, *ConnectionManager.BLINK_ON_CONNECT*, *ConnectionManager.BLINK_ALWAYS*, *ConnectionManager.BLINK_NEVER*
-**Default** *ConnectionManager.BLINK_ON_DISCONNECT*
+This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/) in your application code.
+
+#### blinkupBehavior
 
 The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp circuit (using [**imp.enableblinkup()**](http://electricimp.com/docs/api/imp/enableblinkup):
 
-- *ConnectionManager.BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected.
+- *ConnectionManager.BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected. This is the default value.
 - *ConnectionManager.BLINK_ON_CONNECT* will enable BlinkUp while the imp is connected.
 - *ConnectionManager.BLINK_ALWAYS* will ensure the BlinkUp circuit is always active.
 - *ConnectionManager.BLINK_NEVER* will ensure the BlinkUp circuit is never active.
 
-**Note** impOS *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot.
+**Note** impOS&trade; *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot.
 
 ## Class Methods
 
@@ -69,7 +70,7 @@ cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNECT);
 The *isConnected()* method returns the value of ConnectionManager’s internal connected state flag (whether or not we are connected). This flag is updated every five seconds, or as set by the *checkTimeout* setting in the constructor.
 
 ```squirrel
-if (!cm.isConnection()) {
+if (!cm.isConnected()) {
     // If we're not connected, gather some data, then connect
     cm.onNextConnect(function() {
         local data = sensor.read();
