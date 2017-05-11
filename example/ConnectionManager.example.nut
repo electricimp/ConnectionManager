@@ -1,4 +1,4 @@
-#require "ConnectionManager.class.nut:1.1.0"
+#require "ConnectionManager.lib.nut:1.1.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and starts connected.
