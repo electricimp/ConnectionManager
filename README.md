@@ -14,8 +14,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 
 | key               | default             | notes |
 | ----------------- | ------------------- | ----- |
-| *startConnected*    | `false`             | When set to `true` the device immediately connects |
-| *startDisconnected* | `false`             | When set to `true` the device immediately disconnects |
+| *startupBehavior*    | `START_NO_ACTION`  | See below |
 | *stayConnected*     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
 | *retryOnTimeout*    | `true`              | When set to `true` the device will attempt to connect again if it times out. |
 | *blinkupBehavior*   | BLINK_ON_DISCONNECT | See below |
@@ -38,7 +37,11 @@ imp.setsendbuffersize(8096);
 ```
 
 **Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
-
+####startupBehavior
+The startupBehavior flag modifies what action the ConnectionManager takes when initialized. 
+- *ConnectionManager.START_DO_NOTHING* will take no action after being initialized. This is the default value.
+- *ConnectionManager.START_CONNECTED* will try to connect after being initialized.
+- *ConnectionManager.START_DISCONNECTED* will disconnect after being initialized.
 #### ackTimeout
 
 This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/) in your application code.
@@ -65,7 +68,7 @@ The *setBlinkUpBehavior()* method changes the class’ BlinkUp behavior (see [bl
 cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNECT);
 ```
 
-## isConnected()
+### isConnected()
 
 The *isConnected()* method returns the value of ConnectionManager’s internal connected state flag (whether or not we are connected). This flag is updated every five seconds, or as set by the *checkTimeout* setting in the constructor.
 
@@ -79,7 +82,7 @@ if (!cm.isConnected()) {
 }
 ```
 
-## onDisconnect(*callback*)
+### onDisconnect(*callback*)
 
 The *onDisconnect()* method assigns a callback function to the onDisconnect event. The onDisconnect event will fire every time the connection state changes from online to offline, or when the ConnectionManager’s *disconnect()* method is called (even if the device is already disconnected).
 
@@ -97,7 +100,7 @@ cm.onDisconnect(function(expected) {
 });
 ```
 
-## onConnect(*callback*)
+### onConnect(*callback*)
 
 The *onConnect()* method assigns a callback method to the onConnect event. The onConnect event will fire every time the connection state changes from offline to online, or when the ConnectionManager’s *connect()* method is called (even if the device is already connected).
 
@@ -110,7 +113,7 @@ cm.onConnect(function() {
 });
 ```
 
-## onTimeout(callback)
+### onTimeout(callback)
 
 The *onTimeout* method assigns a callback method to the onTimeout event. The onTimeout event will fire every time the device attempts to connect but does not succeed.
 
@@ -123,7 +126,7 @@ cm.onTimeout(function() {
 });
 ```
 
-## onNextConnect(*callback*)
+### onNextConnect(*callback*)
 
 The *onNextConnect()* method queues a task (the callback) to run the next time the device connects. If the imp is already connected, the callback will be invoked immediately.
 
@@ -150,7 +153,7 @@ function poll() {
 
 **Note** If the imp enters a deep sleep or performs a cold boot, the task queue will be cleared.
 
-## connectFor(*callback*)
+### connectFor(*callback*)
 
 The *connectFor()* method tells the imp to connect, run the callback method, then disconnect when complete. If the imp is already connected, the callback will be invoked immediately, and the imp will disconnect upon completion.
 
