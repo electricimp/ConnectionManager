@@ -14,7 +14,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 
 | key               | default             | notes |
 | ----------------- | ------------------- | ----- |
-| *startupBehavior*    | `START_NO_ACTION`  | See below |
+| *startupBehavior*    | START_NO_ACTION  | See below |
 | *stayConnected*     | `false`             | When set to `true` the device will aggressively attempt to reconnect when disconnected |
 | *retryOnTimeout*    | `true`              | When set to `true` the device will attempt to connect again if it times out. |
 | *blinkupBehavior*   | BLINK_ON_DISCONNECT | See below |
@@ -37,14 +37,11 @@ imp.setsendbuffersize(8096);
 ```
 
 **Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
-####startupBehavior
-The startupBehavior flag modifies what action the ConnectionManager takes when initialized. 
+#### startupBehavior
+The startupBehavior flag modifies what action the ConnectionManager takes when initialized.
 - *ConnectionManager.START_DO_NOTHING* will take no action after being initialized. This is the default value.
 - *ConnectionManager.START_CONNECTED* will try to connect after being initialized.
 - *ConnectionManager.START_DISCONNECTED* will disconnect after being initialized.
-#### ackTimeout
-
-This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/) in your application code.
 
 #### blinkupBehavior
 
@@ -56,6 +53,11 @@ The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp
 - *ConnectionManager.BLINK_NEVER* will ensure the BlinkUp circuit is never active.
 
 **Note** impOS&trade; *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot.
+
+#### ackTimeout
+
+This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/) in your application code.
+
 
 ## Class Methods
 
