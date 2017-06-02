@@ -73,18 +73,17 @@ class ConnectionManager {
         server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
 
         switch (startBehavior) {
-        	case START_NO_ACTION:
-	        	// Do nothing
-	        	break;
-        	case START_CONNECTED:
-	        	// Start connecting if they ask for it
-	            imp.wakeup(0, connect.bindenv(this));
-	            break;
-        	case START_DISCONNECTED:
-	        	// Disconnect if required
+            case START_NO_ACTION:
+                // Do nothing
+                break;
+            case START_CONNECTED:
+                // Start connecting if they ask for it
+                imp.wakeup(0, connect.bindenv(this));
+                break;
+            case START_DISCONNECTED:
+                // Disconnect if required
                 imp.wakeup(0, disconnect.bindenv(this));
-	            _connected = false;
-	            break;
+                break;
         }
 
         // Get the initial state and set BlinkUp accordingly
