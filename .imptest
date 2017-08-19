@@ -1,0 +1,14 @@
+{
+    "modelId": "dgswM93szj14" /* dk_test */,
+    "devices": [
+        "23d8caacc17e10ee" /* rlyeh */
+    ],
+    "agentFile": "tests/inc.agent.nut",
+    "deviceFile": false,
+    "stopOnFailure": false,
+    "timeout": 90,
+    "tests": [
+        "*.test.nut",
+        "tests/**/*.test.nut"
+    ]
+}
