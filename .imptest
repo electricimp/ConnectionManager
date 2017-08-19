@@ -3,7 +3,7 @@
     "devices": [
         "23d8caacc17e10ee" /* rlyeh */
     ],
-    "agentFile": "tests/inc.agent.nut",
+    "agentFile": false,
     "deviceFile": false,
     "stopOnFailure": false,
     "timeout": 90,
