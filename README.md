@@ -39,7 +39,7 @@ imp.setsendbuffersize(8096);
 **Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
 #### startupBehavior
 The startupBehavior flag modifies what action the ConnectionManager takes when initialized.
-- *ConnectionManager.START_DO_NOTHING* will take no action after being initialized. This is the default value.
+- *ConnectionManager.START_NO_ACTION* will take no action after being initialized. This is the default value.
 - *ConnectionManager.START_CONNECTED* will try to connect after being initialized.
 - *ConnectionManager.START_DISCONNECTED* will disconnect after being initialized.
 
