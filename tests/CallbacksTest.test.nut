@@ -26,33 +26,38 @@
 
 class CallbacksTest extends ImpTestCase {
 
-    cm = null; 
-    flag = false;
+  cm = null;
+  static TIMEOUT_1 = 5;
+  static TIMEOUT_2 = 10;
+  static TIMEOUT_3 = 15;
+  static TIMEOUT_4 = 20;
 
+  function setUp() {
+    this.info("running setUp");
+    cm = ConnectionManager();
+  }
 
   /*
   * sets onDisconnect callback and disconnects device using CM
   *
   */
   function testOnDisconnectAsync() {
-    cm = ConnectionManager({"stayConnected" : true});
     cm.onDisconnect(function(expected) {
       this.cm.connect();
     }.bindenv(this));
     this.assertTrue(server.isconnected(), "should be connected!");
-    this.info("going to disconnect");
     this.cm.disconnect();
     this.assertTrue(!server.isconnected(), "should NOT be connected!");
     return Promise(function (resolve, reject) {
-      imp.wakeup(10, function () {
-          try {
-            this.info("should be online now");
-            this.assertTrue(server.isconnected(), "should be connected again!");
-            resolve();
-          } catch (e) {
-            this.cm.connect(); 
-            reject(e);
-          }
+      imp.wakeup(this.TIMEOUT_2, function () {
+        try {
+          this.info("should be online now");
+          this.assertTrue(server.isconnected(), "should be connected again!");
+          resolve();
+        } catch (e) {
+          this.cm.connect(); 
+          reject(e);
+        }
       }.bindenv(this));
     }.bindenv(this));
   }
@@ -62,25 +67,23 @@ class CallbacksTest extends ImpTestCase {
   *
   */
   function testOnConnectAsync() {
-    cm = ConnectionManager({"stayConnected" : true});
-    this.flag = false;
+    local flag = 0;
     cm.onConnect(function() {
-      this.flag = true;
+      flag++;
     }.bindenv(this));
-    this.assertTrue(!this.flag, "should NOT be true yet");
+    this.assertTrue((flag == 0), "should NOT be true yet");
     this.assertTrue(server.isconnected(), "should be connected!");
-    this.info("going to disconnect");
     this.cm.disconnect();
     this.assertTrue(!server.isconnected(), "should NOT be connected!");
     return Promise(function (resolve, reject) {
-      imp.wakeup(3, function() {
+      imp.wakeup(0, function() {
         this.cm.connect();
       }.bindenv(this));
-      imp.wakeup(10, function () {
+      imp.wakeup(this.TIMEOUT_2, function () {
           try {
             this.info("should be online now");
             this.assertTrue(server.isconnected(), "should be connected again!");
-            this.assertTrue(this.flag, "should be true now");
+            this.assertTrue((flag == 1), "should be true now");
             resolve();
           } catch (e) {
             reject(e);
@@ -94,29 +97,26 @@ class CallbacksTest extends ImpTestCase {
   *
   */
   function testOnNextConnectAsync() {
-    cm = ConnectionManager();
-    this.flag = false;
+    local flag = 0;
     cm.onNextConnect(function() {
-      this.flag = true;
+      flag++;
     }.bindenv(this));
-    this.assertTrue(!this.flag, "should NOT be true yet");
+    this.assertTrue((flag == 0), "should NOT be true yet");
     this.assertTrue(server.isconnected(), "should be connected!");
-    this.info("going to disconnect");
     this.cm.disconnect();
     this.assertTrue(!server.isconnected(), "should NOT be connected!");
     return Promise(function (resolve, reject) {
-      imp.wakeup(3, function() {
+      imp.wakeup(this.TIMEOUT_1, function() {
         this.cm.connect();
       }.bindenv(this));
-      imp.wakeup(10, function () {
-          try {
-            this.info("should be online now");
-            this.assertTrue(server.isconnected(), "should be connected again!");
-            this.assertTrue(this.flag, "should be true now");
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
+      imp.wakeup(this.TIMEOUT_2, function () {
+        try {
+          this.assertTrue(server.isconnected(), "should be connected again!");
+          this.assertTrue((flag == 1), "should be true now");
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
       }.bindenv(this));
     }.bindenv(this));
   }
@@ -126,35 +126,33 @@ class CallbacksTest extends ImpTestCase {
   *
   */
   function testOnConnectRemovalAsync() {
-    cm = ConnectionManager({"checkTimeout": 0.1 });
-    this.flag = false;
+    local flag = 0;
     cm.onConnect(function() {
-      this.flag = true;
+      flag++;
     }.bindenv(this));
     //cm.connect returns false iff it's already in process of connection
     this.assertTrue(cm.connect(), "should NOT be connecting now");
     return Promise(function (resolve, reject) {
-      imp.wakeup(3, function() {
-        this.assertTrue(this.flag, "flag should be true here");
-        this.flag = false;
+      imp.wakeup(this.TIMEOUT_1, function() {
+        this.assertTrue((flag == 1), "flag should be true here");
         //now nothing should be called on connnect
         this.cm.onConnect(null);
         this.cm.connect();
       }.bindenv(this));
-      imp.wakeup(10, function () {
-          try {
-            this.assertTrue(!this.flag, "flag should NOT be true");
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
+      imp.wakeup(this.TIMEOUT_2, function () {
+        try {
+          //flag should NOT be increases one more time
+          this.assertTrue((flag == 1), "flag should NOT be true");
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
       }.bindenv(this));
     }.bindenv(this));
   }
 
 
   function tearDown() {
-    this.cm = ConnectionManager({"stayConnected" : true});
     this.cm.connect();
     return "Test finished";
   }

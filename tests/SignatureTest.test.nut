@@ -26,7 +26,7 @@
 
 class ConnectionManagerSignatureTest extends ImpTestCase {
 
-	cm = null; 
+  // cm = null; 
   BLINK_VALUES = [ConnectionManager.BLINK_ON_DISCONNECT ConnectionManager.BLINK_ON_CONNECT ConnectionManager.BLINK_ALWAYS ConnectionManager.BLINK_NEVER];
   START_BEHAVIOR_VALUES = [ConnectionManager.START_CONNECTED ConnectionManager.START_NO_ACTION ConnectionManager.START_DISCONNECTED];
 
@@ -41,10 +41,10 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
     this.assertTrue(errorWasThrown, "Expected error was not thrown!");
   }
 
-  function _singleConstructorTest(blink, start, stayConnectedd, retryOnTimeout) {
-    cm = ConnectionManager({
+  function _singleConstructorTest(blink, start, stayConnected, retryOnTimeout) {
+    local cm = ConnectionManager({
       "startupBehavior": start,
-      "stayConnected": stayConnectedd,
+      "stayConnected": stayConnected,
       "retryOnTimeout": retryOnTimeout,
       "connectTimeout": 90,
       "ackTimeout": 3,
@@ -52,20 +52,23 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
       "blinkupBehavior": blink
     });
 
-    this.info("testing constructor (blink=" + start + ", start=" + blink + ", stayConnectedd=" + stayConnectedd + ", retryOnTimeout=" + retryOnTimeout + "): cm is " + cm);
+    this.info("testing constructor (blink=" + start + ", start=" + blink + ", stayConnected=" + stayConnected + ", retryOnTimeout=" + retryOnTimeout + "): cm is " + cm);
   }
 
   function setUp() {
     return "No setUp needed for this test";
   }
 
-  //Checking that neither of valid arg combinations will result in error
+  /*
+  * checking that neither of valid arg combinations will result in error
+  *
+  */
   function testConstructor() {
     foreach (start in START_BEHAVIOR_VALUES ) {
       foreach (blink in BLINK_VALUES ) {
-        foreach (stayConnectedd in [true false]){
+        foreach (stayConnected in [true false]){
           foreach (retryOnTimeout in [true false]){
-          _singleConstructorTest(blink, start, stayConnectedd, retryOnTimeout);
+          _singleConstructorTest(blink, start, stayConnected, retryOnTimeout);
           }
         }
       }
@@ -73,10 +76,11 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
   }
 
   function testSetBlinkUpBehavior() {
-    cm = ConnectionManager({});
+    local cm = ConnectionManager({});
     foreach (blink in BLINK_VALUES ) {
       cm.setBlinkUpBehavior(blink);
     }
+    //not an issue
     // _commonNegativeTest(function() {
     //     cm.setBlinkUpBehavior(100);
     //   }.bindenv(this));
@@ -85,8 +89,12 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
     //   }.bindenv(this));
   }
 
+  /*
+  * checking that no expection will be trown
+  *
+  */
   function testOnTimeout() {
-    cm = ConnectionManager({});
+    local cm = ConnectionManager({});
     cm.onTimeout(function() {
        server.sleepfor(600);
     });
@@ -97,6 +105,8 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
   }
 
   function tearDown() {
+    local cm = ConnectionManager({});
+    cm.connect();
     return "Test finished";
   }
 }
