@@ -6,6 +6,7 @@
     "agentFile": false,
     "deviceFile": false,
     "stopOnFailure": false,
+    "allowDisconnect": true,
     "timeout": 90,
     "tests": [
         "*.test.nut",
