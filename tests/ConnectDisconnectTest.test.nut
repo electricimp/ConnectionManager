@@ -27,10 +27,6 @@
 class ConnectDisconnectTest extends ImpTestCase {
 
   cm = null;
-  static TIMEOUT_1 = 5;
-  static TIMEOUT_2 = 10;
-  static TIMEOUT_3 = 15;
-  static TIMEOUT_4 = 20;
 
   function setUp() {
     this.info("running setUp");
@@ -42,27 +38,31 @@ class ConnectDisconnectTest extends ImpTestCase {
   *
   */
   function testSingleConnectDisconnectCMAsync() {
-    this.assertTrue(server.isconnected(), "should be connected!");
-    this.assertTrue(this.cm.isConnected(), "CM should report state as connected!");
-    this.info("going to disconnect");
-    this.cm.disconnect();
-    this.assertTrue(!server.isconnected(), "should NOT be connected!");
-    this.assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
-    return Promise(function (resolve, reject) {
-      imp.wakeup(this.TIMEOUT_1, function() {
-        this.cm.connect();
+    return Promise(function(resolve, reject) {
+      cm.onDisconnect(function(expected) {
+        assertTrue(!server.isconnected(), "should NOT be connected!");
+        assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
+        cm.connect();
       }.bindenv(this));
-      imp.wakeup(this.TIMEOUT_2, function () {
-          try {
-            this.info("should be online now");
-            this.assertTrue(server.isconnected(), "should be connected again!");
-            this.assertTrue(this.cm.isConnected(), "CM should report state as connected!");
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
+
+      cm.onConnect(function() {
+        resolve();
       }.bindenv(this));
-    }.bindenv(this));
+
+      cm.disconnect();
+      assertTrue(!server.isconnected(), "should NOT be connected!");
+      assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
+    }.bindenv(this))
+    .then(function(val) {
+        info("should be online now");
+        assertTrue(cm.isConnected(), "CM should report state as connected!");
+        assertTrue(server.isconnected(), "should be connected again!");
+        _resetCM.call(this);
+    }.bindenv(this))
+    .fail(function(valueOrReason) {
+        _resetCM.call(this);
+        throw valueOrReason;
+      }.bindenv(this));
   }
 
   /*
@@ -70,25 +70,36 @@ class ConnectDisconnectTest extends ImpTestCase {
   *
   */
   function testDoubleDisconnectAsync() {
-    this.assertTrue(server.isconnected(), "Expected to be connected after ConnectionManager.connect() invocation");
-    this.cm.disconnect();
-    this.assertTrue(!server.isconnected(), "should NOT be connected!");
-    return Promise(function (resolve, reject) {
-      imp.wakeup(this.TIMEOUT_2, function() {
-        this.assertTrue(!server.isconnected(), "1: should NOT be connected!");
-        this.cm.disconnect();
-        this.assertTrue(!server.isconnected(), "2: should NOT be connected!");
-        this.cm.connect();
+    assertTrue(server.isconnected(), "Failed pre-run saanity check");
+    return Promise(function(resolve, reject) {
+      cm.onDisconnect(function(expected) {
+        assertTrue(!server.isconnected(), "should NOT be connected!");
+        assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
+        cm.connect();
       }.bindenv(this));
-      imp.wakeup(this.TIMEOUT_4, function () {
-        try {
-          this.assertTrue(server.isconnected(), "should be connected again!");
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
+
+      cm.disconnect();
+      assertTrue(!server.isconnected(), "should NOT be connected!");
+      assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
+
+      cm.onConnect(function() {
+        resolve();
       }.bindenv(this));
-    }.bindenv(this));
+
+      cm.disconnect();
+      assertTrue(!server.isconnected(), "should NOT be connected!");
+      assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
+    }.bindenv(this))
+    .then(function(val) {
+        info("should be online now");
+        assertTrue(cm.isConnected(), "CM should report state as connected!");
+        assertTrue(server.isconnected(), "should be connected again!");
+        _resetCM.call(this);
+    }.bindenv(this))
+    .fail(function(valueOrReason) {
+        _resetCM.call(this);
+        throw valueOrReason;
+      }.bindenv(this));
   }
 
 /*
@@ -96,61 +107,73 @@ class ConnectDisconnectTest extends ImpTestCase {
 *
 */
   function testDoubleConnectAsync() {
-    if (!cm.isConnected()) {
-     cm.connect();
-     this.info("Was disconnected, should be connected now.");
-    }
-    return Promise(function (resolve, reject) {
-      imp.wakeup(this.TIMEOUT_1, function() {
-        this.cm.connect();
-        this.assertTrue(server.isconnected(), "should be connected again!");
-        this.cm.connect();
+    assertTrue(server.isconnected(), "Failed pre-run saanity check");
+    return Promise(function(resolve, reject) {
+      cm.connect();
+      assertTrue(server.isconnected(), "should be connected!");
+      assertTrue(cm.isConnected(), "CM should report connected state!");
+
+      cm.onConnect(function() {
+        assertTrue(server.isconnected(), "should be connected!");
+        assertTrue(cm.isConnected(), "CM should report connected state!");
+        resolve();
       }.bindenv(this));
-      imp.wakeup(this.TIMEOUT_2, function () {
-          try {
-            this.info("should be online now");
-            this.assertTrue(server.isconnected(), "should be connected again!");
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
+
+      cm.connect();
+      assertTrue(server.isconnected(), "should be connected!");
+      assertTrue(cm.isConnected(), "CM should report connected state!");
+    }.bindenv(this))
+    .then(function(val) {
+        info("should be online now");
+        assertTrue(cm.isConnected(), "CM should report state as connected!");
+        assertTrue(server.isconnected(), "should be connected again!");
+        _resetCM.call(this);
+    }.bindenv(this))
+    .fail(function(valueOrReason) {
+        _resetCM.call(this);
+        throw valueOrReason;
       }.bindenv(this));
-    }.bindenv(this));
   }
 
   function _checkConnectForCommon(needDisconnect = false) {
-    local flag = false;
-    this.assertTrue(server.isconnected(), "0: should be connected!");
+    local flag = 0;
+    assertTrue(server.isconnected(), "Failed pre-run saanity check");
     if (needDisconnect) {
-      this.cm.disconnect();
-      this.assertTrue(!server.isconnected(), "1: should NOT be connected!");
+      cm.disconnect();
+      assertTrue(!server.isconnected(), "should NOT be connected!");
     }
-    return Promise(function (resolve, reject) {
-      imp.wakeup(0, function() {
-        this.cm.connectFor(function() {
-            this.info("inside ConnectFor");
-            this.assertTrue(server.isconnected(), "inside connectFor: should be connected!");
-            flag = true;
-          }.bindenv(this));
-      }.bindenv(this));
-      imp.wakeup(this.TIMEOUT_3, function() {
-        this.assertTrue(!this.cm.isConnected(), "2.0: should NOT be connected!");
-        this.assertTrue(!server.isconnected(), "2.1: should NOT be connected!");
-        this.cm.connect();
-      }.bindenv(this));
-      imp.wakeup(this.TIMEOUT_4, function () {
-          try {
-            this.info("should be online now");
-            this.assertTrue(server.isconnected(), "3: should be connected again!");
-            this.assertTrue(flag, "should be true now");
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
-      }.bindenv(this));
-    }.bindenv(this));
-  }
+    return Promise(function(resolve, reject) {
+      cm.onDisconnect(function(expected) {
+        assertTrue(!cm.isConnected(), "should NOT be connected!");
+        assertTrue(!server.isconnected(), "should NOT be connected!");
 
+        cm.onConnect(function() {
+          assertTrue(flag==2, "flag should be 2 now");
+          flag++;
+          resolve();
+        }.bindenv(this));
+        flag++;
+        cm.connect();
+      }.bindenv(this));
+
+      cm.connectFor(function() {
+        info("inside ConnectFor");
+        assertTrue(server.isconnected(), "inside connectFor: should be connected!");
+        flag++;
+      }.bindenv(this));
+    }.bindenv(this))
+    .then(function(val) {
+        info("should be online now");
+        assertTrue(cm.isConnected(), "CM should report state as connected!");
+        assertTrue(server.isconnected(), "should be connected again!");
+        assertTrue(flag==3, "flag should be 3 now");
+        _resetCM.call(this);
+    }.bindenv(this))
+    .fail(function(valueOrReason) {
+        _resetCM.call(this);
+        throw valueOrReason;
+      }.bindenv(this));
+  }
 
   /*
   * sets connectFor callback calls cm.disconnect before
@@ -171,6 +194,23 @@ class ConnectDisconnectTest extends ImpTestCase {
   function tearDown() {
     this.cm.connect();
     return "Test finished";
+  }
+
+  /*
+  * resets Cm state to default ones
+  *
+  */
+  function _resetCM(e = null) {
+    this.info("reseting CM");
+    //setting behavior constants to default
+    this.cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
+
+    //resetting callbacks for events
+    this.cm.onConnect(null);
+    this.cm.onTimeout(null);
+    this.cm.onDisconnect(null);
+
+    this.cm.connect();
   }
 
 }
