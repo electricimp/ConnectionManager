@@ -51,7 +51,6 @@ class CallbacksTest extends ImpTestCase {
       assertTrue(!server.isconnected(), "should NOT be connected!");
     }.bindenv(this))
     .then(function(val) {
-        info("should be online now");
         assertTrue(server.isconnected(), "should be connected again!");
         _resetCM.call(this);
     }.bindenv(this))
@@ -75,7 +74,6 @@ class CallbacksTest extends ImpTestCase {
 
       cm.onConnect(function() {
         flag++;
-        info("flag = " + flag);
         resolve();
       }.bindenv(this));
 
@@ -105,7 +103,6 @@ class CallbacksTest extends ImpTestCase {
         assertTrue(!flag, "should be 0 now");
         cm.onNextConnect(function() {
           flag++;
-          info("flag = " + flag);
           resolve();
         }.bindenv(this));
         cm.connect();
@@ -136,7 +133,6 @@ class CallbacksTest extends ImpTestCase {
     return Promise(function(resolve, reject) {
       cm.onConnect(function() {
         flag++;
-        info("flag = " + flag);
         //in case onConnect will be called twice, second time flag will become 2 and test fails
         assertTrue(flag==1, "should be 1 now");
         resolve();
@@ -146,7 +142,6 @@ class CallbacksTest extends ImpTestCase {
       assertTrue(cm.connect(), "should NOT be connecting now");
     }.bindenv(this))
     .then(function(val) {
-      //not assertTrue(flag, ...) to ensure flag was increased exactly one time
       cm.onConnect(null);
       cm.connect();
       _resetCM.call(this);
@@ -158,21 +153,21 @@ class CallbacksTest extends ImpTestCase {
   }
 
   function tearDown() {
-    this.cm.connect();
+    _resetCM.call(this);
     return "Test finished";
   }
 
   function _resetCM(e = null) {
-    this.info("reseting CM");
+    info("reseting CM");
     //setting behavior constants to default
-    this.cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
+    cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
 
     //resetting callbacks for events
-    this.cm.onConnect(null);
-    this.cm.onTimeout(null);
-    this.cm.onDisconnect(null);
+    cm.onConnect(null);
+    cm.onTimeout(null);
+    cm.onDisconnect(null);
 
-    this.cm.connect();
+    cm.connect();
   }
 
 }

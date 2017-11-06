@@ -54,7 +54,6 @@ class ConnectDisconnectTest extends ImpTestCase {
       assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
     }.bindenv(this))
     .then(function(val) {
-        info("should be online now");
         assertTrue(cm.isConnected(), "CM should report state as connected!");
         assertTrue(server.isconnected(), "should be connected again!");
         _resetCM.call(this);
@@ -91,7 +90,6 @@ class ConnectDisconnectTest extends ImpTestCase {
       assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
     }.bindenv(this))
     .then(function(val) {
-        info("should be online now");
         assertTrue(cm.isConnected(), "CM should report state as connected!");
         assertTrue(server.isconnected(), "should be connected again!");
         _resetCM.call(this);
@@ -124,7 +122,6 @@ class ConnectDisconnectTest extends ImpTestCase {
       assertTrue(cm.isConnected(), "CM should report connected state!");
     }.bindenv(this))
     .then(function(val) {
-        info("should be online now");
         assertTrue(cm.isConnected(), "CM should report state as connected!");
         assertTrue(server.isconnected(), "should be connected again!");
         _resetCM.call(this);
@@ -157,13 +154,11 @@ class ConnectDisconnectTest extends ImpTestCase {
       }.bindenv(this));
 
       cm.connectFor(function() {
-        info("inside ConnectFor");
         assertTrue(server.isconnected(), "inside connectFor: should be connected!");
         flag++;
       }.bindenv(this));
     }.bindenv(this))
     .then(function(val) {
-        info("should be online now");
         assertTrue(cm.isConnected(), "CM should report state as connected!");
         assertTrue(server.isconnected(), "should be connected again!");
         assertTrue(flag==3, "flag should be 3 now");
@@ -192,7 +187,7 @@ class ConnectDisconnectTest extends ImpTestCase {
   }
 
   function tearDown() {
-    this.cm.connect();
+    _resetCM.call(this);
     return "Test finished";
   }
 
@@ -200,17 +195,17 @@ class ConnectDisconnectTest extends ImpTestCase {
   * resets Cm state to default ones
   *
   */
-  function _resetCM(e = null) {
-    this.info("reseting CM");
+  function _resetCM() {
+    info("reseting CM");
     //setting behavior constants to default
-    this.cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
+    cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
 
     //resetting callbacks for events
-    this.cm.onConnect(null);
-    this.cm.onTimeout(null);
-    this.cm.onDisconnect(null);
+    cm.onConnect(null);
+    cm.onTimeout(null);
+    cm.onDisconnect(null);
 
-    this.cm.connect();
+    cm.connect();
   }
 
 }
