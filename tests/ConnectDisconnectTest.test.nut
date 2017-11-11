@@ -23,189 +23,160 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 @include "./ConnectionManager.lib.nut"
+@include "./tests/CommonTest.nut"
 
-class ConnectDisconnectTest extends ImpTestCase {
+class ConnectDisconnectTest extends CommonTest {
 
-  cm = null;
-
-  function setUp() {
-    this.info("running setUp");
-    cm = ConnectionManager();
-  }
-
-  /*
-  * disconnects and connects device using CM
-  *
-  */
-  function testSingleConnectDisconnectCMAsync() {
-    return Promise(function(resolve, reject) {
-      cm.onDisconnect(function(expected) {
-        assertTrue(!server.isconnected(), "should NOT be connected!");
-        assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
-        cm.connect();
-      }.bindenv(this));
-
-      cm.onConnect(function() {
-        resolve();
-      }.bindenv(this));
-
-      cm.disconnect();
-      assertTrue(!server.isconnected(), "should NOT be connected!");
-      assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
-    }.bindenv(this))
-    .then(function(val) {
-        assertTrue(cm.isConnected(), "CM should report state as connected!");
-        assertTrue(server.isconnected(), "should be connected again!");
-        _resetCM.call(this);
-    }.bindenv(this))
-    .fail(function(valueOrReason) {
-        _resetCM.call(this);
-        throw valueOrReason;
-      }.bindenv(this));
-  }
-
-  /*
-  * Verifies that more than one disconnect() invocation doesn't result in incorect behavior
-  *
-  */
-  function testDoubleDisconnectAsync() {
-    assertTrue(server.isconnected(), "Failed pre-run saanity check");
-    return Promise(function(resolve, reject) {
-      cm.onDisconnect(function(expected) {
-        assertTrue(!server.isconnected(), "should NOT be connected!");
-        assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
-        cm.connect();
-      }.bindenv(this));
-
-      cm.disconnect();
-      assertTrue(!server.isconnected(), "should NOT be connected!");
-      assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
-
-      cm.onConnect(function() {
-        resolve();
-      }.bindenv(this));
-
-      cm.disconnect();
-      assertTrue(!server.isconnected(), "should NOT be connected!");
-      assertTrue(!cm.isConnected(), "CM should NOT report connected state!");
-    }.bindenv(this))
-    .then(function(val) {
-        assertTrue(cm.isConnected(), "CM should report state as connected!");
-        assertTrue(server.isconnected(), "should be connected again!");
-        _resetCM.call(this);
-    }.bindenv(this))
-    .fail(function(valueOrReason) {
-        _resetCM.call(this);
-        throw valueOrReason;
-      }.bindenv(this));
-  }
-
-/*
-* Verifies that more than one connect() invocation doesn't lead to disconnection
-*
-*/
-  function testDoubleConnectAsync() {
-    assertTrue(server.isconnected(), "Failed pre-run saanity check");
-    return Promise(function(resolve, reject) {
-      cm.connect();
-      assertTrue(server.isconnected(), "should be connected!");
-      assertTrue(cm.isConnected(), "CM should report connected state!");
-
-      cm.onConnect(function() {
-        assertTrue(server.isconnected(), "should be connected!");
-        assertTrue(cm.isConnected(), "CM should report connected state!");
-        resolve();
-      }.bindenv(this));
-
-      cm.connect();
-      assertTrue(server.isconnected(), "should be connected!");
-      assertTrue(cm.isConnected(), "CM should report connected state!");
-    }.bindenv(this))
-    .then(function(val) {
-        assertTrue(cm.isConnected(), "CM should report state as connected!");
-        assertTrue(server.isconnected(), "should be connected again!");
-        _resetCM.call(this);
-    }.bindenv(this))
-    .fail(function(valueOrReason) {
-        _resetCM.call(this);
-        throw valueOrReason;
-      }.bindenv(this));
-  }
-
-  function _checkConnectForCommon(needDisconnect = false) {
-    local flag = 0;
-    assertTrue(server.isconnected(), "Failed pre-run saanity check");
-    if (needDisconnect) {
-      cm.disconnect();
-      assertTrue(!server.isconnected(), "should NOT be connected!");
+    function setUp() {
+        _setUp();
     }
-    return Promise(function(resolve, reject) {
-      cm.onDisconnect(function(expected) {
-        assertTrue(!cm.isConnected(), "should NOT be connected!");
-        assertTrue(!server.isconnected(), "should NOT be connected!");
+    
+    /*
+    * disconnects and connects device using CM
+    *
+    */
+    function testSingleConnectDisconnectCMAsync() {
+        return Promise(function(resolve, reject) {
+            _cm.onDisconnect(function(expected) {
+                assertTrue(!server.isconnected(), "should NOT be connected!");
+                assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
+                _cm.connect();
+            }.bindenv(this));
 
-        cm.onConnect(function() {
-          assertTrue(flag==2, "flag should be 2 now");
-          flag++;
-          resolve();
-        }.bindenv(this));
-        flag++;
-        cm.connect();
-      }.bindenv(this));
+            _cm.onConnect(function() {
+                resolve();
+            }.bindenv(this));
 
-      cm.connectFor(function() {
-        assertTrue(server.isconnected(), "inside connectFor: should be connected!");
-        flag++;
-      }.bindenv(this));
-    }.bindenv(this))
-    .then(function(val) {
-        assertTrue(cm.isConnected(), "CM should report state as connected!");
+            _disconnectAndCheck();
+        }.bindenv(this))
+        .then(_commonThenStep.bindenv(this))
+        .fail(_commonFailStep.bindenv(this));
+    }
+
+    /*
+    * Verifies that more than one disconnect() invocation doesn't result in incorect behavior
+    *
+    */
+    function testDoubleDisconnectAsync() {
+        assertTrue(server.isconnected(), "Failed pre-run sanity check");
+        return Promise(function(resolve, reject) {
+            _cm.onDisconnect(function(expected) {
+                assertTrue(!server.isconnected(), "should NOT be connected!");
+                assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
+                _cm.connect();
+            }.bindenv(this));
+
+            _disconnectAndCheck();
+
+            _cm.onConnect(function() {
+                resolve();
+            }.bindenv(this));
+
+            _disconnectAndCheck();
+        }.bindenv(this))
+        .then(_commonThenStep.bindenv(this))
+        .fail(_commonFailStep.bindenv(this));
+    }
+
+    /*
+    * Verifies that more than one connect() invocation doesn't lead to disconnection
+    *
+    */
+    function testDoubleConnectAsync() {
+        assertTrue(server.isconnected(), "Failed pre-run sanity check");
+        return Promise(function(resolve, reject) {
+            _cm.connect();
+            assertTrue(server.isconnected(), "should be connected!");
+            assertTrue(_cm.isConnected(), "CM should report connected state!");
+
+            _cm.onConnect(function() {
+                assertTrue(server.isconnected(), "should be connected!");
+                assertTrue(_cm.isConnected(), "CM should report connected state!");
+                resolve();
+            }.bindenv(this));
+
+            _cm.connect();
+            assertTrue(server.isconnected(), "should be connected!");
+            assertTrue(_cm.isConnected(), "CM should report connected state!");
+        }.bindenv(this))
+        .then(_commonThenStep.bindenv(this))
+        .fail(_commonFailStep.bindenv(this));
+    }
+
+    /*
+    * sets connectFor callback
+    *
+    */
+    function testConnectForAsync() {
+        return _checkConnectForCommon();
+    }
+
+    /*
+    * sets connectFor callback calls _cm.disconnect before
+    *
+    */
+    function testConnectForFromDisconnectedStateAsync() {
+        return _checkConnectForCommon(true);
+    }
+
+    function tearDown() {
+        _resetCM();
+        return "Test finished";
+    }
+
+    //-------------------- PRIVATE METHODS --------------------//
+
+    function _checkConnectForCommon(needDisconnect = false) {
+        local counter = 0;
+        assertTrue(server.isconnected(), "Failed pre-run sanity check");
+        if (needDisconnect) {
+            _cm.disconnect();
+            assertTrue(!server.isconnected(), "should NOT be connected!");
+        }
+        return Promise(function(resolve, reject) {
+            _cm.onDisconnect(function(expected) {
+                assertTrue(!_cm.isConnected(), "should NOT be connected!");
+                assertTrue(!server.isconnected(), "should NOT be connected!");
+
+                _cm.onConnect(function() {
+                    assertEqual(counter, 2, "counter should be 2 now");
+                    counter++;
+                    resolve();
+                }.bindenv(this));
+                counter++;
+                _cm.connect();
+            }.bindenv(this));
+
+            _cm.connectFor(function() {
+                assertTrue(server.isconnected(), "inside connectFor: should be connected!");
+                counter++;
+            }.bindenv(this));
+        }.bindenv(this))
+        .then(function(val) {
+            assertEqual(counter, 3, "counter should be 3 now");
+            _commonThenStep();
+        }.bindenv(this))
+        .fail(_commonFailStep.bindenv(this));
+    }
+
+    /*
+    *function that is used as a common check in all Promise.then invocations in this test
+    *
+    */
+    function _commonThenStep(val = null) {
+        assertTrue(_cm.isConnected(), "CM should report state as connected!");
         assertTrue(server.isconnected(), "should be connected again!");
-        assertTrue(flag==3, "flag should be 3 now");
-        _resetCM.call(this);
-    }.bindenv(this))
-    .fail(function(valueOrReason) {
-        _resetCM.call(this);
-        throw valueOrReason;
-      }.bindenv(this));
-  }
+        _resetCM();
+    }
 
-  /*
-  * sets connectFor callback calls cm.disconnect before
-  *
-  */
-  function testConnectForFromDisconnectedStateAsync() {
-    return _checkConnectForCommon(true);
-  }
-
-  /*
-  * sets connectFor callback without calling cm.disconnect before
-  *
-  */
-  function testConnectForAsync() {
-    return _checkConnectForCommon(false);
-  }
-
-  function tearDown() {
-    _resetCM.call(this);
-    return "Test finished";
-  }
-
-  /*
-  * resets Cm state to default ones
-  *
-  */
-  function _resetCM() {
-    info("reseting CM");
-    //setting behavior constants to default
-    cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
-
-    //resetting callbacks for events
-    cm.onConnect(null);
-    cm.onTimeout(null);
-    cm.onDisconnect(null);
-
-    cm.connect();
-  }
+    /*
+    *disconnects device and cheks that it was actually disconnected
+    *
+    */
+    function _disconnectAndCheck() {
+        _cm.disconnect();
+        assertTrue(!server.isconnected(), "should NOT be connected!");
+        assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
+    }
 
 }
