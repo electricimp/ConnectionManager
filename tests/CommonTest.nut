@@ -24,7 +24,7 @@
 
 class CommonTest extends ImpTestCase {
 
-	_cm = null;
+    _cm = null;
 
     function _setUp() {
         info("running setUp");
@@ -32,16 +32,16 @@ class CommonTest extends ImpTestCase {
     }
 
     function _resetCM() {
-    	info("reseting CM");
-	    //setting behavior constants to default
-    	_cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
+        info("reseting CM");
+        //setting behavior constants to default
+        _cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
 
-	    //resetting callbacks for events
-    	_cm.onConnect(null);
-	    _cm.onTimeout(null);
-    	_cm.onDisconnect(null);
+        //resetting callbacks for events
+        _cm.onConnect(null);
+        _cm.onTimeout(null);
+        _cm.onDisconnect(null);
 
-	    _cm.connect();
+        _cm.connect();
     }
 
     /*

@@ -31,7 +31,7 @@ class OnNextConnectTest extends CommonTest {
         _setUp();
     }
 
-	/*
+    /*
     * sets onNextConnect callback and disconnects device using CM
     *
     */

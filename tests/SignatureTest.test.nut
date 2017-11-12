@@ -26,7 +26,6 @@
 
 class ConnectionManagerSignatureTest extends ImpTestCase {
 
- 
     BLINK_VALUES = [
         ConnectionManager.BLINK_ON_DISCONNECT,
         ConnectionManager.BLINK_ON_CONNECT,
