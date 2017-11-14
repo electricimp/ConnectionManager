@@ -61,7 +61,7 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
             "blinkupBehavior": blink
         });
 
-        info("testing constructor (blink=" + start + ", start=" + blink + ", stayConnected=" + stayConnected + ", retryOnTimeout=" + retryOnTimeout + "): cm is " + cm);
+        // info("testing constructor (blink=" + start + ", start=" + blink + ", stayConnected=" + stayConnected + ", retryOnTimeout=" + retryOnTimeout + "): cm is " + cm);
     }
 
     function setUp() {
