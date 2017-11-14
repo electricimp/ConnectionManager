@@ -1,0 +1,15 @@
+{
+    "modelId": "yAGfbguy7_mj" /* B */,
+    "devices": [
+        "23236c6938a609ee" /* B */
+    ],
+    "agentFile": false,
+    "deviceFile": false,
+    "stopOnFailure": false,
+    "allowDisconnect": true,
+    "timeout": 90,
+    "tests": [
+        "*.test.nut",
+        "tests/**/*.test.nut"
+    ]
+}
