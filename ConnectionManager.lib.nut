@@ -335,7 +335,7 @@ class ConnectionManager {
         }
 
         if (_stayConnected) {
-            !expected && imp.wakeup(0, connect.bindenv(this));
+            imp.wakeup(0, connect.bindenv(this));
         } else {
             // Brutally stop trying to connect
             server.disconnect();
