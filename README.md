@@ -235,3 +235,4 @@ See *log()*, above, for example code.
 ## License
 
 The ConnectionManager class is licensed under the [MIT License](https://github.com/electricimp/ConnectionManager/blob/master/LICENSE).
+
