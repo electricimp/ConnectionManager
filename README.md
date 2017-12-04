@@ -1,4 +1,4 @@
-# ConnectionManager 2.0.0
+# ConnectionManager 2.0.1
 
 The ConnectionManager class is an Electric Imp device-side library aimed at simplifying connect and disconnect flows.
 
@@ -25,7 +25,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 | *ackTimeout*        | 1                   | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. |
 
 ```squirrel
-#require "ConnectionManager.lib.nut:2.0.0"
+#require "ConnectionManager.lib.nut:2.0.1"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically agressively try to reconnect on disconnect
