@@ -24,7 +24,7 @@
 
 
 class ConnectionManager {
-    static VERSION = "2.0.1";
+    static VERSION = "2.1.0";
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
