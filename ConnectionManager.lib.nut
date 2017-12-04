@@ -72,6 +72,7 @@ class ConnectionManager {
         _logs = [];
 
         // Set the timeout policy + disconnect if required
+        server.log(errorPolicy);
         server.setsendtimeoutpolicy(errorPolicy, waitPolicy, ackTimeout);
 
         switch (startBehavior) {
