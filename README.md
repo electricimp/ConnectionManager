@@ -20,6 +20,8 @@ The ConnectionManager class can be instantiated with an optional table of settin
 | *blinkupBehavior*   | BLINK_ON_DISCONNECT | See below |
 | *checkTimeout*      | 5                   | Changes how often the ConnectionManager checks the connection state (online / offline). |
 | *connectTimeout*    | 60                  | Float. Maximum time (in seconds) allowed for the imp to connect to the server before timing out. |
+| *errorPolicy*       | RETURN_ON_ERROR     | The disconnection handling policy: either SUSPEND_ON_ERROR, RETURN_ON_ERROR or RETURN_ON_ERROR_NO_DISCONNECT. |
+| *waitPolicy*        | WAIT_TIL_SENT       | The successful transmission criterion: either WAIT_TIL_SENT or WAIT_FOR_ACK. |
 | *ackTimeout*        | 1                   | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. |
 
 ```squirrel
