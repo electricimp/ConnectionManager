@@ -24,7 +24,7 @@
 
 
 class ConnectionManager {
-    static VERSION = "2.0.0";
+    static VERSION = "2.1.0";
 
     static BLINK_ALWAYS = 0;
     static BLINK_NEVER = 1;
@@ -57,20 +57,22 @@ class ConnectionManager {
 
     constructor(settings = {}) {
         // Grab settings
-        _checkTimeout = ("checkTimeout" in settings) ? settings.checkTimeout : 5;
-        _connectTimeout = ("connectTimeout" in settings) ? settings.connectTimeout : 60;
-        _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
-        _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
-        _retryOnTimeout = ("retryOnTimeout" in settings) ? settings.retryOnTimeout : true;
-        local startBehavior = ("startBehavior" in settings) ? settings.startBehavior : START_NO_ACTION;
-        local ackTimeout = ("ackTimeout" in settings) ? settings.ackTimeout : 1;
+        _checkTimeout       = ("checkTimeout"    in settings) ? settings.checkTimeout    : 5;
+        _connectTimeout     = ("connectTimeout"  in settings) ? settings.connectTimeout  : 60;
+        _stayConnected      = ("stayConnected"   in settings) ? settings.stayConnected   : false;
+        _blinkupBehavior    = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
+        _retryOnTimeout     = ("retryOnTimeout"  in settings) ? settings.retryOnTimeout  : true;
+        local startBehavior = ("startBehavior"   in settings) ? settings.startBehavior   : START_NO_ACTION;
+        local errorPolicy   = ("errorPolicy"     in settings) ? settings.errorPolicy     : RETURN_ON_ERROR;
+        local waitPolicy    = ("waitPolicy"      in settings) ? settings.waitPolicy      : WAIT_TIL_SENT;
+        local ackTimeout    = ("ackTimeout"      in settings) ? settings.ackTimeout      : 1;
 
         // Initialize the onConnected task queue and logs
         _queue = [];
         _logs = [];
 
         // Set the timeout policy + disconnect if required
-        server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
+        server.setsendtimeoutpolicy(errorPolicy, waitPolicy, ackTimeout);
 
         switch (startBehavior) {
             case START_NO_ACTION:

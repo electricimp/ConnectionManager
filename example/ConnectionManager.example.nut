@@ -22,8 +22,8 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
- 
-#require "ConnectionManager.lib.nut:2.0.0"
+
+#require "ConnectionManager.lib.nut:2.1.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and starts connected.
@@ -35,9 +35,9 @@ cm <- ConnectionManager({
 
 // Set the timeout behaviour after failing to connect for 90 seconds.
 cm.onTimeout(function() {
-     // Go to sleep for 10 minutes 
+     // Go to sleep for 10 minutes
      server.sleepfor(600);
  });
 
-// Set the recommended buffer size 
+// Set the recommended buffer size
 imp.setsendbuffersize(8096);
