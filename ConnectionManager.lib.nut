@@ -340,7 +340,7 @@ class ConnectionManager {
             imp.wakeup(0, connect.bindenv(this));
         } else {
             // Brutally stop trying to connect
-            server.disconnect();
+            // server.disconnect(); // TODO: Disable it for now (under test)
         }
     }
 
