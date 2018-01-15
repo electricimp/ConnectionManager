@@ -36,24 +36,24 @@ class ConnectionManager {
     static VERSION = "3.0.0";
 
     // Settings
-    _connectTimeout = null;
-    _checkTimeout = null;
-    _stayConnected = null;
-    _blinkupBehavior = null;
-    _retryOnTimeout = null;
+    _connectTimeout     = null;
+    _checkTimeout       = null;
+    _stayConnected      = null;
+    _blinkupBehavior    = null;
+    _retryOnTimeout     = null;
 
     // Global Handlers
-    _onConnect = null;
-    _onTimeout = null;
-    _onDisconnect = null;
+    _onConnect          = null;
+    _onTimeout          = null;
+    _onDisconnect       = null;
 
     // Connection State
-    _connected = null;
-    _connecting = null;
+    _connected          = null;
+    _connecting         = null;
 
     // The onConnected task queue and logs
-    _queue = null;
-    _logs = null;
+    _queue              = null;
+    _logs               = null;
 
     constructor(settings = {}) {
         // Grab settings
