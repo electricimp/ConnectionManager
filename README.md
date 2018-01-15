@@ -200,9 +200,18 @@ cm.connect();
 
 ### disconnect()
 
-The *disconnect()* method tells ConnectionManager to attempt to disconnect from the server. If it successfully disconnects (or is already disconnected), the ConnectionManager will execute the registered onDisconnect callback, if there is one.
+The *disconnect()* method tells ConnectionManager to attempt to disconnect from the server.
+If it successfully disconnects (or is already disconnected), the ConnectionManager will execute
+the registered onDisconnect callback, if there is one.
 
-If a connect is in process, the disconnect method will return `false` and won’t attempt to disconnect or invoke any callbacks, otherwise it returns `true`.
+If a connect is in process, the disconnect method will return `false` and won’t attempt to
+disconnect or invoke any callbacks, otherwise it returns `true`.
+
+`force` parameter specifies whether the library should disconnect regarding of the connect status
+(whether it's in progress or not). The parameter is optional and is `false` by default.
+
+`flushTimeout` parameter specifies the timeout value used for `server.flush` call. The parameter is
+optional and is equal to `CM_FLUSH_TIMEOUT` (30 seconds) by default.
 
 ```
 cm.disconnect();
