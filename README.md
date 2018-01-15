@@ -1,4 +1,4 @@
-# ConnectionManager 2.2.0
+# ConnectionManager 3.0.0
 
 The ConnectionManager class is an Electric Imp device-side library aimed at simplifying connect and disconnect flows.
 
@@ -25,7 +25,7 @@ The ConnectionManager class can be instantiated with an optional table of settin
 | *ackTimeout*        | 1                   | Float. Maximum time (in seconds) allowed for the server to acknowledge receipt of data. |
 
 ```squirrel
-#require "ConnectionManager.lib.nut:2.2.0"
+#require "ConnectionManager.lib.nut:3.0.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically agressively try to reconnect on disconnect
@@ -41,18 +41,18 @@ imp.setsendbuffersize(8096);
 **Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using the ConnectionManager class, though your application may require a different buffer size.
 #### startBehavior
 The startBehavior flag modifies what action the ConnectionManager takes when initialized.
-- *ConnectionManager.START_NO_ACTION* will take no action after being initialized. This is the default value.
-- *ConnectionManager.START_CONNECTED* will try to connect after being initialized.
-- *ConnectionManager.START_DISCONNECTED* will disconnect after being initialized.
+- *CM_START_NO_ACTION* will take no action after being initialized. This is the default value.
+- *CM_START_CONNECTED* will try to connect after being initialized.
+- *CM_START_DISCONNECTED* will disconnect after being initialized.
 
 #### blinkupBehavior
 
 The blinkupBehavior flag modifies when the ConnectionManager enables the BlinkUp circuit (using [**imp.enableblinkup()**](http://electricimp.com/docs/api/imp/enableblinkup):
 
-- *ConnectionManager.BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected. This is the default value.
-- *ConnectionManager.BLINK_ON_CONNECT* will enable BlinkUp while the imp is connected.
-- *ConnectionManager.BLINK_ALWAYS* will ensure the BlinkUp circuit is always active.
-- *ConnectionManager.BLINK_NEVER* will ensure the BlinkUp circuit is never active.
+- *CM_BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected. This is the default value.
+- *CM_BLINK_ON_CONNECT* will enable BlinkUp while the imp is connected.
+- *CM_BLINK_ALWAYS* will ensure the BlinkUp circuit is always active.
+- *CM_BLINK_NEVER* will ensure the BlinkUp circuit is never active.
 
 **Note** impOS&trade; *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot.
 

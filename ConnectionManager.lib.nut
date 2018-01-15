@@ -32,7 +32,8 @@ const CM_START_CONNECTED       = 1;
 const CM_START_DISCONNECTED    = 2;
 
 class ConnectionManager {
-    static VERSION = "2.2.0";
+
+    static VERSION = "3.0.0";
 
     // Settings
     _connectTimeout = null;
