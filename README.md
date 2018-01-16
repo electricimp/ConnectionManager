@@ -207,7 +207,7 @@ the registered onDisconnect callback, if there is one.
 If a connect is in process, the disconnect method will return `false` and won’t attempt to
 disconnect or invoke any callbacks, otherwise it returns `true`.
 
-`force` parameter specifies whether the library should disconnect regarding of the connect status
+`force` parameter specifies whether the library should disconnect regardless of the connect status
 (whether it's in progress or not). The parameter is optional and is `false` by default.
 
 `flushTimeout` parameter specifies the timeout value used for `server.flush` call. The parameter is

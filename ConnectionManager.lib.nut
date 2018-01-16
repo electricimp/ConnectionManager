@@ -82,7 +82,7 @@ class ConnectionManager {
                 // Start connecting if they ask for it
                 imp.wakeup(0, connect.bindenv(this));
                 break;
-            case SCM_TART_DISCONNECTED:
+            case CM_START_DISCONNECTED:
                 // Disconnect if required
                 imp.wakeup(0, disconnect.bindenv(this));
                 break;
@@ -194,8 +194,6 @@ class ConnectionManager {
     //
     // Returns:         this
     function disconnect(force = false, flushTimeout = CM_FLUSH_TIMEOUT) {
-        // If we're connecting / disconnecting, try again in 0.5 seconds
-
         if (force) {
             _connecting = false;
         }
@@ -355,7 +353,7 @@ class ConnectionManager {
             imp.wakeup(0, connect.bindenv(this));
         } else {
             // Brutally stop trying to connect
-            // server.disconnect(); // TODO: Disable it for now (under test)
+            server.disconnect();
         }
     }
 
