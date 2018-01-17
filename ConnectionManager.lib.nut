@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright 2015-2017 Electric Imp
+// Copyright 2015-2018 Electric Imp
 
 // SPDX-License-Identifier: MIT
 
@@ -22,14 +22,14 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-const CM_BLINK_ALWAYS          = 0;
-const CM_BLINK_NEVER           = 1;
-const CM_BLINK_ON_CONNECT      = 2;
-const CM_BLINK_ON_DISCONNECT   = 3;
-const CM_FLUSH_TIMEOUT         = 30;
-const CM_START_NO_ACTION       = 0;
-const CM_START_CONNECTED       = 1;
-const CM_START_DISCONNECTED    = 2;
+const CM_BLINK_ALWAYS        = 0;
+const CM_BLINK_NEVER         = 1;
+const CM_BLINK_ON_CONNECT    = 2;
+const CM_BLINK_ON_DISCONNECT = 3;
+const CM_FLUSH_TIMEOUT       = 30;
+const CM_START_NO_ACTION     = 0;
+const CM_START_CONNECTED     = 1;
+const CM_START_DISCONNECTED  = 2;
 
 class ConnectionManager {
 
