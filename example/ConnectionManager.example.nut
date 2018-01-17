@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright 2015-2017 Electric Imp
+// Copyright 2015-2018 Electric Imp
 
 // SPDX-License-Identifier: MIT
 
@@ -23,7 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 
-#require "ConnectionManager.lib.nut:2.1.0"
+#require "ConnectionManager.lib.nut:3.0.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and starts connected.

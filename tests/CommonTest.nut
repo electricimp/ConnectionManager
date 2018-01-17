@@ -34,7 +34,7 @@ class CommonTest extends ImpTestCase {
     function _resetCM() {
         info("reseting CM");
         //setting behavior constants to default
-        _cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_DISCONNECT);
+        _cm.setBlinkUpBehavior(CM_BLINK_ON_DISCONNECT);
 
         //resetting callbacks for events
         _cm.onConnect(null);
