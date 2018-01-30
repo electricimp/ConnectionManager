@@ -27,16 +27,16 @@
 class ConnectionManagerSignatureTest extends ImpTestCase {
 
     BLINK_VALUES = [
-        ConnectionManager.BLINK_ON_DISCONNECT,
-        ConnectionManager.BLINK_ON_CONNECT,
-        ConnectionManager.BLINK_ALWAYS,
-        ConnectionManager.BLINK_NEVER
-        ];
-        
+        CM_BLINK_ON_DISCONNECT,
+        CM_BLINK_ON_CONNECT,
+        CM_BLINK_ALWAYS,
+        CM_BLINK_NEVER
+    ];
+
     START_BEHAVIOR_VALUES = [
-        ConnectionManager.START_CONNECTED,
-        ConnectionManager.START_NO_ACTION,
-        ConnectionManager.START_DISCONNECTED
+        CM_START_CONNECTED,
+        CM_START_NO_ACTION,
+        CM_START_DISCONNECTED
     ];
 
     function _commonNegativeTest(cb) {
@@ -61,7 +61,7 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
             "blinkupBehavior": blink
         });
 
-        info("testing constructor (blink=" + start + ", start=" + blink + ", stayConnected=" + stayConnected + ", retryOnTimeout=" + retryOnTimeout + "): cm is " + cm);
+        // info("testing constructor (blink=" + start + ", start=" + blink + ", stayConnected=" + stayConnected + ", retryOnTimeout=" + retryOnTimeout + "): cm is " + cm);
     }
 
     function setUp() {

@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright 2015-2017 Electric Imp
+// Copyright 2015-2018 Electric Imp
 
 // SPDX-License-Identifier: MIT
 
@@ -22,65 +22,67 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+const CM_BLINK_ALWAYS        = 0;
+const CM_BLINK_NEVER         = 1;
+const CM_BLINK_ON_CONNECT    = 2;
+const CM_BLINK_ON_DISCONNECT = 3;
+const CM_FLUSH_TIMEOUT       = 30;
+const CM_START_NO_ACTION     = 0;
+const CM_START_CONNECTED     = 1;
+const CM_START_DISCONNECTED  = 2;
 
 class ConnectionManager {
-    static VERSION = "2.0.0";
 
-    static BLINK_ALWAYS = 0;
-    static BLINK_NEVER = 1;
-    static BLINK_ON_CONNECT = 2;
-    static BLINK_ON_DISCONNECT = 3;
-    static FLUSH_TIMEOUT = 30;
-    static START_NO_ACTION = 0;
-    static START_CONNECTED = 1;
-    static START_DISCONNECTED = 2;
+    static VERSION = "3.0.0";
 
     // Settings
-    _connectTimeout = null;
-    _checkTimeout = null;
-    _stayConnected = null;
-    _blinkupBehavior = null;
-    _retryOnTimeout = null;
+    _connectTimeout     = null;
+    _checkTimeout       = null;
+    _stayConnected      = null;
+    _blinkupBehavior    = null;
+    _retryOnTimeout     = null;
 
     // Global Handlers
-    _onConnect = null;
-    _onTimeout = null;
-    _onDisconnect = null;
+    _onConnect          = null;
+    _onTimeout          = null;
+    _onDisconnect       = null;
 
     // Connection State
-    _connected = null;
-    _connecting = null;
+    _connected          = null;
+    _connecting         = null;
 
     // The onConnected task queue and logs
-    _queue = null;
-    _logs = null;
+    _queue              = null;
+    _logs               = null;
 
     constructor(settings = {}) {
         // Grab settings
-        _checkTimeout = ("checkTimeout" in settings) ? settings.checkTimeout : 5;
-        _connectTimeout = ("connectTimeout" in settings) ? settings.connectTimeout : 60;
-        _stayConnected = ("stayConnected" in settings) ? settings.stayConnected : false;
-        _blinkupBehavior = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : BLINK_ON_DISCONNECT;
-        _retryOnTimeout = ("retryOnTimeout" in settings) ? settings.retryOnTimeout : true;
-        local startBehavior = ("startBehavior" in settings) ? settings.startBehavior : START_NO_ACTION;
-        local ackTimeout = ("ackTimeout" in settings) ? settings.ackTimeout : 1;
+        _checkTimeout       = ("checkTimeout"    in settings) ? settings.checkTimeout    : 5;
+        _connectTimeout     = ("connectTimeout"  in settings) ? settings.connectTimeout  : 60;
+        _stayConnected      = ("stayConnected"   in settings) ? settings.stayConnected   : false;
+        _blinkupBehavior    = ("blinkupBehavior" in settings) ? settings.blinkupBehavior : CM_BLINK_ON_DISCONNECT;
+        _retryOnTimeout     = ("retryOnTimeout"  in settings) ? settings.retryOnTimeout  : true;
+        local startBehavior = ("startBehavior"   in settings) ? settings.startBehavior   : CM_START_NO_ACTION;
+        local errorPolicy   = ("errorPolicy"     in settings) ? settings.errorPolicy     : RETURN_ON_ERROR;
+        local waitPolicy    = ("waitPolicy"      in settings) ? settings.waitPolicy      : WAIT_TIL_SENT;
+        local ackTimeout    = ("ackTimeout"      in settings) ? settings.ackTimeout      : 1;
 
         // Initialize the onConnected task queue and logs
         _queue = [];
         _logs = [];
 
         // Set the timeout policy + disconnect if required
-        server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, ackTimeout);
+        server.setsendtimeoutpolicy(errorPolicy, waitPolicy, ackTimeout);
 
         switch (startBehavior) {
-            case START_NO_ACTION:
+            case CM_START_NO_ACTION:
                 // Do nothing
                 break;
-            case START_CONNECTED:
+            case CM_START_CONNECTED:
                 // Start connecting if they ask for it
                 imp.wakeup(0, connect.bindenv(this));
                 break;
-            case START_DISCONNECTED:
+            case CM_START_DISCONNECTED:
                 // Disconnect if required
                 imp.wakeup(0, disconnect.bindenv(this));
                 break;
@@ -182,19 +184,32 @@ class ConnectionManager {
         return true;
     }
 
-    // Disconnects, and runs the onDisconnected handler
-    function disconnect() {
-        // If we're connecting / disconnecting, try again in 0.5 seconds
-        if (_connecting) { return false; }
+    // Disconnects, and runs the onDisconnected handler.
+    // Does nothing if the imp is in process of connecting.
+    //
+    // Parameters:
+    //      force           Force disconnect regardless of whether the device
+    //                      already tries to connect now.
+    //      flushTimeout    The timeout used for `server.flush` call.
+    //
+    // Returns:         this
+    function disconnect(force = false, flushTimeout = CM_FLUSH_TIMEOUT) {
+        if (force) {
+            _connecting = false;
+        }
+
+        if (_connecting) {
+            return false;
+        }
 
         // If we're already disconnected: invoke the onDisconnectedFlow and return
-        if (!_connected) {
+        if (!force && !_connected) {
             _onDisconnectedFlow(true);
             return true;
         }
 
         // Disconnect
-        server.flush(FLUSH_TIMEOUT);
+        server.flush(flushTimeout);
         server.disconnect();
 
         // Set the flag
@@ -231,7 +246,7 @@ class ConnectionManager {
     // Sets the BlinkUp behavior to one of the preconfigured options
     //
     // Parameters:
-    //      state:      BLINK_ALWAYS | BLINK_NEVER | BLINK_ON_CONNECT | BLINK_ON_DISCONNECT
+    //      state:      CM_BLINK_ALWAYS | CM_BLINK_NEVER | CM_BLINK_ON_CONNECT | CM_BLINK_ON_DISCONNECT
     //
     // Returns:         this
     function setBlinkUpBehavior(state) {
@@ -380,19 +395,19 @@ class ConnectionManager {
     // Enables of disables BlinkUp based on _blinkupBehavior and _connected
     function _setBlinkUpState() {
         // If it's set to always blinkup
-        if (_blinkupBehavior == BLINK_ALWAYS) {
+        if (_blinkupBehavior == CM_BLINK_ALWAYS) {
             imp.enableblinkup(true);
             return;
         }
         // If it's set to never blinkup
-        if (_blinkupBehavior == BLINK_NEVER) {
+        if (_blinkupBehavior == CM_BLINK_NEVER) {
             imp.enableblinkup(false);
             return;
         }
 
         // If it's set to blinkup on a specific state
-        if ((_connected && _blinkupBehavior == BLINK_ON_CONNECT)
-        || (!_connected && _blinkupBehavior == BLINK_ON_DISCONNECT)) {
+        if ((_connected && _blinkupBehavior == CM_BLINK_ON_CONNECT)
+        || (!_connected && _blinkupBehavior == CM_BLINK_ON_DISCONNECT)) {
             imp.enableblinkup(true);
         } else {
             imp.enableblinkup(false);
