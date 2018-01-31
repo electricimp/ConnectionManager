@@ -40,15 +40,16 @@ class ConnectDisconnectTest extends CommonTest {
     }
     
     /*
-     * disconnects and connects device using CM
-     *
+     * disconnects device using CM, awaiting autoconnect
+     * after wifi config is setted.
      */
     function testAutoreconnectAsync() {
         return Promise(function(resolve, reject) {
             _cm.onConnect(function() {
                 resolve();
             }.bindenv(this));
-            _cm.log("@{password}");
+
+            assertTrue(((ssid != "null") && (ssid != "")),  "WiFi configuration should be setted for this test")
             _cm.disconnect();
 
             // delete ssid and password
@@ -57,6 +58,7 @@ class ConnectDisconnectTest extends CommonTest {
             imp.wakeup(10, function () {
                 assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
             }.bindenv(this));  
+
             imp.wakeup(20, function () {
                 imp.setwificonfiguration(this.ssid, this.password);
             }.bindenv(this));
@@ -65,22 +67,8 @@ class ConnectDisconnectTest extends CommonTest {
         .fail(_commonFailStep.bindenv(this));
     }
 
-   
     function tearDown() {
         _resetCM();
         return "Test finished";
     }
-
-    //-------------------- PRIVATE METHODS --------------------//
-
-    /*
-     * function that is used as a common check in all Promise.then invocations in this test
-     *
-     */
-    function _commonThenStep(val = null) {
-        assertTrue(_cm.isConnected(), "CM should report state as connected!");
-        assertTrue(server.isconnected(), "should be connected again!");
-        _resetCM();
-    }
-
 }
