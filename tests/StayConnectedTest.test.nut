@@ -27,8 +27,8 @@
 
 class ConnectDisconnectTest extends CommonTest {
 
-    ssid = "@{ssid}";
-    password = "@{password}";
+    ssid = "@{CM_TEST_SSID}";
+    password = "@{CM_TEST_PWD}";
 
     function setUp() {
         info("running setUp");
@@ -41,26 +41,27 @@ class ConnectDisconnectTest extends CommonTest {
     
     /*
      * disconnects device using CM, awaiting autoconnect
-     * after wifi config is setted.
+     * after wifi config is set.
      */
     function testAutoreconnectAsync() {
+
         return Promise(function(resolve, reject) {
+            // pass test when CM reconnected
             _cm.onConnect(function() {
                 resolve();
             }.bindenv(this));
-
-            assertTrue(((ssid != "null") && (ssid != "")),  "WiFi configuration should be setted for this test")
-            _cm.disconnect();
+            assertTrue(((ssid != "null") && (ssid != "")),  "WiFi configuration should be set for this test");
 
             // delete ssid and password
             imp.clearconfiguration(CONFIG_WIFI);
+            _cm.disconnect(true, 5);
 
-            imp.wakeup(10, function () {
-                assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
-            }.bindenv(this));  
-
+            // wait 20 seconds to ensure CM tries to reconnect
             imp.wakeup(20, function () {
-                imp.setwificonfiguration(this.ssid, this.password);
+                assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
+
+                // reset WiFi settings, now CM should reconnect 
+                imp.setwificonfiguration(ssid, password);
             }.bindenv(this));
         }.bindenv(this))
         .then(_commonThenStep.bindenv(this))
