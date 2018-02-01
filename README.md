@@ -236,6 +236,18 @@ The *error()* method will execute a [**server.error()**](https://developer.elect
 
 See *log()*, above, for example code.
 
+## Testing
+
+To test this library you should set up variables `CM_TEST_SSID` and `CM_TEST_PWD`. You can set variables in environment. Also you can create `.imptest-builder` file with `CM_TEST_SSID` and `CM_TEST_PWD` parameters in current directory.
+
+**.imptest-builder file example**
+```JSON
+{
+	"CM_TEST_SSID": "WiFiName",
+    "CM_TEST_PWD": "WiFiPassword"
+}
+``` 
+
 ## License ##
 
 ConnectionManager is licensed under the [MIT License](https://github.com/electricimp/ConnectionManager/blob/master/LICENSE).
