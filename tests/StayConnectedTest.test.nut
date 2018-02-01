@@ -51,9 +51,9 @@ class ConnectDisconnectTest extends CommonTest {
             _cm.onConnect(function() {
                 resolve();
             }.bindenv(this));
-            assertTrue(((ssid != "null") && (ssid != "")),  "WiFi configuration is clear. To pass this test," + 
-                " set the correct ssid and password to environment variables CM_TEST_SSID and CM_TEST_PWD. " +
-                "Or add them to .imptest-builder file.");
+            assertTrue(((ssid != "null") && (ssid != "")),  "The test requires the environment variables " + 
+                "CM_TEST_SSID and CM_TEST_PWD set to the correct existing SSID and password. " +
+                "You can also configure them in the .imptest-builder configuration file.");
 
             // delete ssid and password
             imp.clearconfiguration(CONFIG_WIFI);
