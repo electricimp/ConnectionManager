@@ -46,11 +46,14 @@ class ConnectDisconnectTest extends CommonTest {
     function testAutoreconnectAsync() {
 
         return Promise(function(resolve, reject) {
+            assertTrue(_cm.isConnected(), "CM should report connected state!");
             // pass test when CM reconnected
             _cm.onConnect(function() {
                 resolve();
             }.bindenv(this));
-            assertTrue(((ssid != "null") && (ssid != "")),  "WiFi configuration should be set for this test");
+            assertTrue(((ssid != "null") && (ssid != "")),  "WiFi configuration is clear. To pass this test," + 
+                " set the correct ssid and password to environment variables CM_TEST_SSID and CM_TEST_PWD. " +
+                "Or add them to .imptest-builder file.");
 
             // delete ssid and password
             imp.clearconfiguration(CONFIG_WIFI);
