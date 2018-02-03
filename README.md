@@ -238,13 +238,14 @@ See *log()*, above, for example code.
 
 ## Testing
 
-To test this library you should set up variables `CM_TEST_SSID` and `CM_TEST_PWD`. You can set variables in environment. Also you can create `.imptest-builder` file with `CM_TEST_SSID` and `CM_TEST_PWD` parameters in current directory.
+Some tests change the Wi-Fi configuration, so to get your device back on its feet after the run you should set environment variables `CM_TEST_SSID` and `CM_TEST_PWD` to the valid and existing Wi-Fi SSID and password.
 
-**.imptest-builder file example**
+Alternatively you can create `.imptest-builder` file with `CM_TEST_SSID` and `CM_TEST_PWD` defined: 
+
 ```JSON
 {
-	"CM_TEST_SSID": "WiFiName",
-    "CM_TEST_PWD": "WiFiPassword"
+    "CM_TEST_SSID": "SSID (Wi-Fi network name)",
+    "CM_TEST_PWD": "password"
 }
 ``` 
 

@@ -25,10 +25,7 @@
 @include "./ConnectionManager.lib.nut"
 @include "./tests/CommonTest.nut"
 
-class ConnectDisconnectTest extends CommonTest {
-
-    ssid = "@{CM_TEST_SSID}";
-    password = "@{CM_TEST_PWD}";
+class StayConnectedTest extends CommonTest {
 
     function setUp() {
         info("running setUp");
@@ -46,7 +43,11 @@ class ConnectDisconnectTest extends CommonTest {
     function testAutoreconnectAsync() {
 
         return Promise(function(resolve, reject) {
-            assertTrue(_cm.isConnected(), "CM should report connected state!");
+            assertTrue(_cm.isConnected(), "CM should report connected state!")
+
+            local ssid = "@{CM_TEST_SSID}";
+            local password = "@{CM_TEST_PWD}";
+
             // pass test when CM reconnected
             _cm.onConnect(function() {
                 resolve();
@@ -59,8 +60,9 @@ class ConnectDisconnectTest extends CommonTest {
             imp.clearconfiguration(CONFIG_WIFI);
             _cm.disconnect(true, 5);
 
-            // wait 20 seconds to ensure CM tries to reconnect
-            imp.wakeup(20, function () {
+            // allow for some time to make sure we are not hanging on trying to reconnect with a clean config
+            // (there was a bug in the impOS which lead to this)
+            imp.wakeup(10, function () {
                 assertTrue(!_cm.isConnected(), "CM should NOT report connected state!");
 
                 // reset WiFi settings, now CM should reconnect 
