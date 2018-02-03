@@ -74,7 +74,6 @@ class StayConnectedTest extends CommonTest {
     }
 
     function tearDown() {
-        _resetCM();
         return "Test finished";
     }
 }
