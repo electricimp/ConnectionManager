@@ -40,7 +40,7 @@ class StayConnectedTest extends CommonTest {
      * disconnects device using CM, awaiting autoconnect
      * after wifi config is set.
      */
-    function testAutoreconnectAsync() {
+    function testStayConnectedAsync() {
 
         return Promise(function(resolve, reject) {
             assertTrue(_cm.isConnected(), "CM should report connected state!")
