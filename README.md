@@ -236,7 +236,7 @@ The *error()* method will execute a [**server.error()**](https://developer.elect
 
 See *log()*, above, for example code.
 
-## Testing
+## Running Tests
 
 Some tests change the Wi-Fi configuration, so to get your device back on its feet after the run you should set environment variables `CM_TEST_SSID` and `CM_TEST_PWD` to the valid and existing Wi-Fi SSID and password.
 
