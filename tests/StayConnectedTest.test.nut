@@ -37,8 +37,9 @@ class StayConnectedTest extends CommonTest {
     }
     
     /*
-     * disconnects device using CM, awaiting autoconnect
-     * after wifi config is set.
+     * This test case verifies the following scenario (caused by a bug in the impOS):
+     * Set Connection Manager to `stayconnected: true` and then clear the WiFi configuration.
+     * When Connection Manager tries to reconnect, the imp hangs.
      */
     function testStayConnectedAsync() {
 
