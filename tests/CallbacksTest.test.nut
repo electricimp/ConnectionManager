@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2017 Electric Imp
+// Copyright 2017-2018 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -32,9 +32,9 @@ class CallbacksTest extends CommonTest {
     }
     
     /*
-    * sets onDisconnect callback and disconnects device using CM
-    *
-    */
+     * sets onDisconnect callback and disconnects device using CM
+     *
+     */
     function testOnDisconnectAsync() {
         return Promise(function(resolve, reject) {
             _cm.onDisconnect(function(expected) {
@@ -55,10 +55,10 @@ class CallbacksTest extends CommonTest {
         .fail(_commonFailStep.bindenv(this));
     }
 
-   /*
-    * sets onConnect callback and disconnects device using CM
-    *
-    */
+    /*
+     * sets onConnect callback and disconnects device using CM
+     *
+     */
     function testOnConnectAsync() {
         return Promise(function(resolve, reject) {
             local cCounter = 0;
@@ -88,10 +88,10 @@ class CallbacksTest extends CommonTest {
         .fail(_commonFailStep.bindenv(this));
     }
 
-   /*
-    * removes onConnect callback checks it is not firing any more
-    *
-    */
+    /*
+     * removes onConnect callback checks it is not firing any more
+     *
+     */
     function testOnConnectRemovalAsync() {
         return Promise(function(resolve, reject) {
             local counter = 0;
@@ -115,18 +115,6 @@ class CallbacksTest extends CommonTest {
     function tearDown() {
         _resetCM();
         return "Test finished";
-    }
-
-    //-------------------- PRIVATE METHODS --------------------//
-
-    /*
-    *function that is used as a common check in all Promise.then invocations in this test
-    *
-    */
-    function _commonThenStep() {
-        assertTrue(_cm.isConnected(), "CM should report state as connected!");
-        assertTrue(server.isconnected(), "should be connected again!");
-        _resetCM();
     }
 
 }

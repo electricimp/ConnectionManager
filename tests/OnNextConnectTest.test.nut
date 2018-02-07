@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2017 Electric Imp
+// Copyright 2017-2018 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -32,9 +32,9 @@ class OnNextConnectTest extends CommonTest {
     }
 
     /*
-    * sets onNextConnect callback and disconnects device using CM
-    *
-    */
+     * sets onNextConnect callback and disconnects device using CM
+     *
+     */
     function testOnNextConnectAsync() {
         return Promise(function(resolve, reject) {
             local counter = 0;
