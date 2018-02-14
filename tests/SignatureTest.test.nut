@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2017 Electric Imp
+// Copyright 2017-2018 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -69,9 +69,9 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
     }
 
     /*
-    * checking that neither of valid arg combinations will result in error
-    *
-    */
+     * checking that neither of valid arg combinations will result in error
+     *
+     */
     function testConstructor() {
         foreach (start in START_BEHAVIOR_VALUES ) {
             foreach (blink in BLINK_VALUES ) {
@@ -99,9 +99,9 @@ class ConnectionManagerSignatureTest extends ImpTestCase {
     }
 
     /*
-    * checking that no expection will be trown
-    *
-    */
+     * checking that no expection will be trown
+     *
+     */
     function testOnTimeout() {
         local cm = ConnectionManager({});
         cm.onTimeout(function() {
