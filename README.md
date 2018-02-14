@@ -236,17 +236,15 @@ The *error()* method will execute a [**server.error()**](https://developer.elect
 
 See *log()*, above, for example code.
 
-## Running Tests
+## Running Tests ##
 
-Some tests change the Wi-Fi configuration, so to get your device back on its feet after the run you should set environment variables `CM_TEST_SSID` and `CM_TEST_PWD` to the valid and existing Wi-Fi SSID and password.
+Some tests change the test device’s WiFi configuration. To ensure that the test device’s WiFi settings are restored after the test run, you should set the environment variables *CM_TEST_SSID* and *CM_TEST_PWD* to the required WiFi SSID and password, respectively.
 
-Alternatively you can create `.imptest-builder` file with `CM_TEST_SSID` and `CM_TEST_PWD` defined: 
+Alternatively, you can create an `.imptest-builder` file with *CM_TEST_SSID* and *CM_TEST_PWD* defined within it. For example: 
 
 ```JSON
-{
-    "CM_TEST_SSID": "SSID (Wi-Fi network name)",
-    "CM_TEST_PWD": "password"
-}
+{ "CM_TEST_SSID": "<YOUR_WIFI_SSID>",
+  "CM_TEST_PWD": "<YOUR_WIFI_PASSWORD>" }
 ``` 
 
 ## License ##
