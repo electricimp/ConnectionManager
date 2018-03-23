@@ -160,16 +160,6 @@ class ConnectDisconnectTest extends CommonTest {
     }
 
     /*
-    *function that is used as a common check in all Promise.then invocations in this test
-    *
-    */
-    function _commonThenStep(val = null) {
-        assertTrue(_cm.isConnected(), "CM should report state as connected!");
-        assertTrue(server.isconnected(), "should be connected again!");
-        _resetCM();
-    }
-
-    /*
     *disconnects device and cheks that it was actually disconnected
     *
     */

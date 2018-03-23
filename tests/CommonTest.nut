@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2017 Electric Imp
+// Copyright 2017-2018 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -45,12 +45,22 @@ class CommonTest extends ImpTestCase {
     }
 
     /*
-    *function that is used as a common fail handler in all Promise.fail invocations
-    *
-    */
+     * function that is used as a common fail handler in all Promise.fail invocations
+     *
+     */
     function _commonFailStep(valueOrReason = null) {
         _resetCM();
         throw valueOrReason;
+    }
+
+    /*
+     * function that is used as a common check in all Promise.then invocations in this test
+     *
+     */
+    function _commonThenStep(val = null) {
+        assertTrue(_cm.isConnected(), "CM should report state as connected!");
+        assertTrue(server.isconnected(), "should be connected again!");
+        _resetCM();
     }
 
 }

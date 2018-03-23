@@ -236,6 +236,17 @@ The *error()* method will execute a [**server.error()**](https://developer.elect
 
 See *log()*, above, for example code.
 
+## Running Tests ##
+
+Some tests change the test device’s WiFi configuration. To ensure that the test device’s WiFi settings are restored after the test run, you should set the environment variables *CM_TEST_SSID* and *CM_TEST_PWD* to the required WiFi SSID and password, respectively.
+
+Alternatively, you can create an `.imptest-builder` file with *CM_TEST_SSID* and *CM_TEST_PWD* defined within it. For example: 
+
+```JSON
+{ "CM_TEST_SSID": "<YOUR_WIFI_SSID>",
+  "CM_TEST_PWD": "<YOUR_WIFI_PASSWORD>" }
+``` 
+
 ## License ##
 
 ConnectionManager is licensed under the [MIT License](https://github.com/electricimp/ConnectionManager/blob/master/LICENSE).
