@@ -28,9 +28,9 @@
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and starts connected.
 cm <- ConnectionManager({
-    "startupBehavior": START_CONNECTED,
+    "startupBehavior": CM_START_CONNECTED,
     "connectTimeout": 90,
-    "blinkupBehavior": ConnectionManager.BLINK_ALWAYS
+    "blinkupBehavior": CM_BLINK_ALWAYS
 });
 
 // Set the timeout behaviour after failing to connect for 90 seconds.
