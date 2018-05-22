@@ -9,7 +9,7 @@ The ConnectionManager class is an Electric Imp device-side library created to si
 ## Class Usage ##
 
 ### Constructor: ConnectionManager(*[settings]*) ###
- 
+
 ConnectionManager can be instantiated with an optional table of settings that modify its behavior. The following settings are available:
 
 | Key | Default | Notes |
@@ -30,7 +30,7 @@ ConnectionManager can be instantiated with an optional table of settings that mo
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically aggressively try to reconnect on disconnect
 cm <- ConnectionManager({
-    "blinkupBehavior": ConnectionManager.BLINK_ALWAYS,
+    "blinkupBehavior": CM_BLINK_ALWAYS,
     "stayConnected": true
 });
 
@@ -240,12 +240,12 @@ See *log()*, above, for example code.
 
 Some tests change the test device’s WiFi configuration. To ensure that the test device’s WiFi settings are restored after the test run, you should set the environment variables *CM_TEST_SSID* and *CM_TEST_PWD* to the required WiFi SSID and password, respectively.
 
-Alternatively, you can create an `.imptest-builder` file with *CM_TEST_SSID* and *CM_TEST_PWD* defined within it. For example: 
+Alternatively, you can create an `.imptest-builder` file with *CM_TEST_SSID* and *CM_TEST_PWD* defined within it. For example:
 
 ```JSON
 { "CM_TEST_SSID": "<YOUR_WIFI_SSID>",
   "CM_TEST_PWD": "<YOUR_WIFI_PASSWORD>" }
-``` 
+```
 
 ## License ##
 
