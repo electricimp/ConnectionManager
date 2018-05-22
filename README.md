@@ -69,7 +69,7 @@ This method changes the class’ BlinkUp behavior (see above).
 
 ```squirrel
 // Set ConnectionManager to enable BlinkUp only while it's connected
-cm.setBlinkUpBehavior(ConnectionManager.BLINK_ON_CONNECT);
+cm.setBlinkUpBehavior(CM_BLINK_ON_CONNECT);
 ```
 
 ### isConnected() ###
