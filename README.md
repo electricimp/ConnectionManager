@@ -2,7 +2,7 @@
 
 The ConnectionManager class is an Electric Imp device-side library created to simplify connect and disconnect flows.
 
-**Note** If you are using ConnectionManager in your code, you should ensure that you *never* call  [**server.connect()**](https://developer.electricimp.com/api/server/connect/) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect/). Instead you should only use ConnectionManager’s *connect()* and *disconnect()* methods.
+**Note** If you are using ConnectionManager in your code, you should ensure that you *never* call  [**server.connect()**](https://developer.electricimp.com/api/server/connect) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect). Instead you should only use ConnectionManager’s *connect()* and *disconnect()* methods.
 
 **To add this library to your project, add** `#require "ConnectionManager.lib.nut:3.0.0"` **to the top of your device code.**
 
@@ -58,7 +58,7 @@ The *blinkupBehavior* flag modifies when ConnectionManager enables the BlinkUp�
 
 #### Setting: ackTimeout ####
 
-This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy/), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy/) in your application code.
+This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy) in your application code.
 
 ## Class Methods ##
 
@@ -202,7 +202,7 @@ If a connect is in process, the disconnect method will return `false` and won’
 
 The *force* parameter provides a means to specify whether ConnectionManager should disconnect regardless of the connection status (ie. whether it’s in progress or not). The parameter is optional and is `false` by default.
 
-The *flushTimeout* parameter specifies the timeout value used for [**server.flush()**](https://developer.electricimp.com/api/server/flush/) calls. The parameter is
+The *flushTimeout* parameter specifies the timeout value used for [**server.flush()**](https://developer.electricimp.com/api/server/flush) calls. The parameter is
 optional and is equal to *CM_FLUSH_TIMEOUT* (30 seconds) by default.
 
 ```
@@ -211,7 +211,7 @@ cm.disconnect();
 
 ### log(*message*) ###
 
-This method will execute a [**server.log()**](https://developer.electricimp.com/api/server/log/) command (if connected), or queue the value of *message* to be logged on the next connect. Any object that can be passed to [**server.log()**](https://developer.electricimp.com/api/server/log/) can be passed to *log()*.
+This method will execute a [**server.log()**](https://developer.electricimp.com/api/server/log) command (if connected), or queue the value of *message* to be logged on the next connect. Any object that can be passed to [**server.log()**](https://developer.electricimp.com/api/server/log) can be passed to *log()*.
 
 **Note** The ConnectionManager class stores log messages in memory but doesn’t persist log messages across deep sleeps and cold boots.
 
@@ -229,7 +229,7 @@ cm.onDisconnect(function(expected) {
 
 ### error(*message*) ###
 
-The *error()* method will execute a [**server.error()**](https://developer.electricimp.com/api/server/error/) command (if connected), or queue the value of *errorMessage* to be logged on the next connect. Any object that can be passed to [**server.error()**](https://developer.electricimp.com/api/server/error/) can be passed to *error()*.
+The *error()* method will execute a [**server.error()**](https://developer.electricimp.com/api/server/error) command (if connected), or queue the value of *errorMessage* to be logged on the next connect. Any object that can be passed to [**server.error()**](https://developer.electricimp.com/api/server/error) can be passed to *error()*.
 
 **Note** The ConnectionManager class stores log messages in memory but doesn’t persist log messages across deep sleeps and cold boots.
 
