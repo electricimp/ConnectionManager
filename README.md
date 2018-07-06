@@ -2,7 +2,7 @@
 
 The ConnectionManager class is an Electric Imp device-side library created to simplify connect and disconnect flows.
 
-**Note** If you are using ConnectionManager in your code, you should ensure that you *never* call  [**server.connect()**](https://developer.electricimp.com/api/server/connect/) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect/). Instead you should only use ConnectionManager’s *connect()* and *disconnect()* methods.
+**Note** If you are using ConnectionManager in your code, you should ensure that you *never* call  [**server.connect()**](https://developer.electricimp.com/api/server/connect) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect). Instead you should only use ConnectionManager’s *connect()* and *disconnect()* methods.
 
 **To add this library to your project, add** `#require "ConnectionManager.lib.nut:3.0.0"` **to the top of your device code.**
 
@@ -14,10 +14,10 @@ ConnectionManager can be instantiated with an optional table of settings that mo
 
 | Key | Default | Notes |
 | --- | --- | --- |
-| *startBehavior* | *START_NO_ACTION* | See below |
+| *startBehavior* | *CM_START_NO_ACTION* | See below |
 | *stayConnected* | `false` | When set to `true`, the device will aggressively attempt to reconnect when disconnected |
 | *retryOnTimeout* | `true` | When set to `true`, the device will attempt to connect again if it times out |
-| *blinkupBehavior* | *BLINK_ON_DISCONNECT* | See below |
+| *blinkupBehavior* | *CM_BLINK_ON_DISCONNECT* | See below |
 | *checkTimeout* | 5 | Changes how often the ConnectionManager checks the connection state (online/offline) |
 | *connectTimeout* | 60 | Float. Maximum time (in seconds) allowed for the imp to connect to the server before timing out |
 | *errorPolicy* | *RETURN_ON_ERROR* | The disconnection handling policy: *SUSPEND_ON_ERROR*, *RETURN_ON_ERROR or *RETURN_ON_ERROR_NO_DISCONNECT* |
@@ -29,10 +29,8 @@ ConnectionManager can be instantiated with an optional table of settings that mo
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically aggressively try to reconnect on disconnect
-cm <- ConnectionManager({
-    "blinkupBehavior": CM_BLINK_ALWAYS,
-    "stayConnected": true
-});
+cm <- ConnectionManager({ "blinkupBehavior": CM_BLINK_ALWAYS,
+                          "stayConnected"  : true });
 
 // Set the recommended buffer size (see note below)
 imp.setsendbuffersize(8096);
@@ -41,6 +39,7 @@ imp.setsendbuffersize(8096);
 **Note** We’ve found setting the buffer size to 8096 to be very helpful in many applications using ConnectionManager, though your application may require a different buffer size.
 
 #### Setting: startBehavior ####
+
 The *startBehavior* flag modifies what action ConnectionManager takes when initialized.
 - *CM_START_NO_ACTION* will take no action after being initialized. This is the default value.
 - *CM_START_CONNECTED* will try to connect after being initialized.
@@ -59,7 +58,7 @@ The *blinkupBehavior* flag modifies when ConnectionManager enables the BlinkUp�
 
 #### Setting: ackTimeout ####
 
-This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy/), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy/) in your application code.
+This value is passed into the imp API method [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy), overriding any value your code may have already set in a separate call to that method (or overridden by a subsequent call your code makes). We recommend that if you make use of ConnectionManager, you ensure that you **never** call [**server.setsendtimeoutpolicy()**](https://developer.electricimp.com/api/server/setsendtimeoutpolicy) in your application code.
 
 ## Class Methods ##
 
@@ -78,11 +77,11 @@ This method returns the value of ConnectionManager’s internal connection state
 
 ```squirrel
 if (!cm.isConnected()) {
-    // If we're not connected, gather some data, then connect
-    cm.onNextConnect(function() {
-        local data = sensor.read();
-        agent.send("data", data);
-    }).connect();
+  // If we're not connected, gather some data, then connect
+  cm.onNextConnect(function() {
+    local data = sensor.read();
+    agent.send("data", data);
+  }).connect();
 }
 ```
 
@@ -94,13 +93,13 @@ The callback method takes a single parameter, *expected*, which is `true` when t
 
 ```squirrel
 cm.onDisconnect(function(expected) {
-    if (expected) {
-        // Log a regular message that we disconnected as expected
-        cm.log("Expected Disconnect");
-    } else {
-        // Log an error message that we unexpectedly disconnected
-        cm.error("Unexpected Disconnect");
-    }
+  if (expected) {
+    // Log a regular message that we disconnected as expected
+    cm.log("Expected Disconnect");
+  } else {
+    // Log an error message that we unexpectedly disconnected
+    cm.error("Unexpected Disconnect");
+  }
 });
 ```
 
@@ -112,8 +111,8 @@ The callback function has no parameters.
 
 ```squirrel
 cm.onConnect(function() {
-    // Send a message to the agent indicating that we're online
-    agent.send("online", true);
+  // Send a message to the agent indicating that we're online
+  agent.send("online", true);
 });
 ```
 
@@ -125,8 +124,8 @@ The callback function has no parameters.
 
 ```squirrel
 cm.onTimeout(function() {
-    // Go to sleep for 10 minutes if the device fails to connect
-    server.sleepfor(600);
+  // Go to sleep for 10 minutes if the device fails to connect
+  server.sleepfor(600);
 });
 ```
 
@@ -138,18 +137,18 @@ The callback function has no parameters.
 
 ```squirrel
 function poll() {
-    // Wake up every 60 seconds and gather data
-    imp.wakeup(60, poll);
+  // Wake up every 60 seconds and gather data
+  imp.wakeup(60, poll);
 
-    // Read the data, and insert the timestamp into the data table
-    // (in this example, we assume sensor.read() returns a table)
-    local data = sensor.read();
-    data["ts"] <- time();
+  // Read the data, and insert the timestamp into the data table
+  // (in this example, we assume sensor.read() returns a table)
+  local data = sensor.read();
+  data.ts <- time();
 
-    // Send the data the next time we connect
-    cm.onNextConnect(function() {
-        agent.send("data", data);
-    });
+  // Send the data the next time we connect
+  cm.onNextConnect(function() {
+    agent.send("data", data);
+  });
 }
 ```
 
@@ -163,15 +162,15 @@ The callback function has no parameters.
 
 ```squirrel
 function poll() {
-    // Wake up every 60 seconds, connect, send data and disconnect
-    imp.wakeup(60, poll);
+  // Wake up every 60 seconds, connect, send data and disconnect
+  imp.wakeup(60, poll);
 
-    cm.connectFor(function() {
-        // Read and send the data
-        local data = sensor.read();
-        data["ts"] <- time();
-        agent.send("data", data);
-    });
+  cm.connectFor(function() {
+    // Read and send the data
+    local data = sensor.read();
+    data.ts <- time();
+    agent.send("data", data);
+  });
 }
 ```
 
@@ -179,9 +178,9 @@ function poll() {
 
 ```squirrel
 cm.onNextConnect(function() {
-    // Do something
-    ...
-    cm.disconnect();
+  // Do something
+  ...
+  cm.disconnect();
 }).connect();
 ```
 
@@ -203,7 +202,7 @@ If a connect is in process, the disconnect method will return `false` and won’
 
 The *force* parameter provides a means to specify whether ConnectionManager should disconnect regardless of the connection status (ie. whether it’s in progress or not). The parameter is optional and is `false` by default.
 
-The *flushTimeout* parameter specifies the timeout value used for [**server.flush()**](https://developer.electricimp.com/api/server/flush/) calls. The parameter is
+The *flushTimeout* parameter specifies the timeout value used for [**server.flush()**](https://developer.electricimp.com/api/server/flush) calls. The parameter is
 optional and is equal to *CM_FLUSH_TIMEOUT* (30 seconds) by default.
 
 ```
@@ -212,25 +211,25 @@ cm.disconnect();
 
 ### log(*message*) ###
 
-This method will execute a [**server.log()**](https://developer.electricimp.com/api/server/log/) command (if connected), or queue the value of *message* to be logged on the next connect. Any object that can be passed to [**server.log()**](https://developer.electricimp.com/api/server/log/) can be passed to *log()*.
+This method will execute a [**server.log()**](https://developer.electricimp.com/api/server/log) command (if connected), or queue the value of *message* to be logged on the next connect. Any object that can be passed to [**server.log()**](https://developer.electricimp.com/api/server/log) can be passed to *log()*.
 
 **Note** The ConnectionManager class stores log messages in memory but doesn’t persist log messages across deep sleeps and cold boots.
 
 ```squirrel
 cm.onDisconnect(function(expected) {
-    if (expected) {
-        // Log a regular message that we disconnected as expected
-        cm.log("Expected Disconnect");
-    } else {
-        // Log an error message that we unexpectedly disconnected
-        cm.error("Unexpected Disconnect");
-    }
+  if (expected) {
+    // Log a regular message that we disconnected as expected
+    cm.log("Expected Disconnect");
+  } else {
+    // Log an error message that we unexpectedly disconnected
+    cm.error("Unexpected Disconnect");
+  }
 });
 ```
 
 ### error(*message*) ###
 
-The *error()* method will execute a [**server.error()**](https://developer.electricimp.com/api/server/error/) command (if connected), or queue the value of *errorMessage* to be logged on the next connect. Any object that can be passed to [**server.error()**](https://developer.electricimp.com/api/server/error/) can be passed to *error()*.
+The *error()* method will execute a [**server.error()**](https://developer.electricimp.com/api/server/error) command (if connected), or queue the value of *errorMessage* to be logged on the next connect. Any object that can be passed to [**server.error()**](https://developer.electricimp.com/api/server/error) can be passed to *error()*.
 
 **Note** The ConnectionManager class stores log messages in memory but doesn’t persist log messages across deep sleeps and cold boots.
 
@@ -244,8 +243,8 @@ Alternatively, you can create an `.imptest-builder` file with *CM_TEST_SSID* and
 
 ```JSON
 { "CM_TEST_SSID": "<YOUR_WIFI_SSID>",
-  "CM_TEST_PWD": "<YOUR_WIFI_PASSWORD>" }
-```
+  "CM_TEST_PWD" : "<YOUR_WIFI_PASSWORD>" }
+``` 
 
 ## License ##
 
