@@ -120,19 +120,8 @@ class ConnectionManager {
      * @callback onConnectCallback
      */
     function onConnect(callback, callbackId = CM_DEFAULT_CALLBACK_ID) {
-        _onConnect[callbackId] <- callback;
-        return this;
+        return _setCallback(_onConnect, callbackId, callback);
     }
-
-
-    // Sets an onTimeout handler that fires when a connection attempt fails. Passing
-    // null to this function removes the onTimeout handler
-    //
-    // Parameters:
-    //      callback:   The onTimeout handler (no parameters)
-    //
-    // Returns:         this
-
 
     /**
      * Sets an onTimeout handler that fires when a connection attempt fails.
@@ -152,9 +141,7 @@ class ConnectionManager {
      * @callback onTimeoutCallback
      */
     function onTimeout(callback, callbackId = CM_DEFAULT_CALLBACK_ID) {
-        _onTimeout[callbackId] <- callback;
-
-        return this;
+        return _setCallback(_onTimeout, callbackId, callback);
     }
 
     /**
@@ -175,10 +162,8 @@ class ConnectionManager {
      * @param {boolean} expected - is `true` when onDisconnect was called because of a disconnect()
      *                             is `false` otherwise
      */
-    function onDisconnect(callback) {
-        _onDisconnect[callbackId] <- callback;
-
-        return this;
+    function onDisconnect(callback, callbackId = CM_DEFAULT_CALLBACK_ID) {
+        return _setCallback(_onDisconnect, callbackId, callback);
     }
 
     // Returns the ConnectionManager's view of if we're connected or not
@@ -324,6 +309,15 @@ class ConnectionManager {
     }
 
     //-------------------- PRIVATE METHODS --------------------//
+
+    function _setCallback(cbTable, cbId, cb) {
+        if (cb == null) {
+            cbTable.rawdelete(cbId);
+        } else {
+            cbTable[cbId] <- cb;
+        }
+        return this;
+    }
 
     // Wraps a callback function so it executes, then immediatly
     // disconnects.
