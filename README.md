@@ -203,7 +203,8 @@ If a connect is in process, the disconnect method will return `false` and won’
 The *force* parameter provides a means to specify whether ConnectionManager should disconnect regardless of the connection status (ie. whether it’s in progress or not). The parameter is optional and is `false` by default.
 
 The *flushTimeout* parameter specifies the timeout value used for [**server.flush()**](https://developer.electricimp.com/api/server/flush) calls. The parameter is
-optional and is equal to *CM_FLUSH_TIMEOUT* (30 seconds) by default.
+optional and is equal to *CM_FLUSH_TIMEOUT* (30 seconds) by default. If `flushTimeout`  
+is equal to -1, no flush is performed.
 
 ```
 cm.disconnect();

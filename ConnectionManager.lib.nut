@@ -33,7 +33,7 @@ const CM_START_DISCONNECTED  = 2;
 
 class ConnectionManager {
 
-    static VERSION = "3.0.0";
+    static VERSION = "3.1.0";
 
     // Settings
     _connectTimeout     = null;
@@ -184,15 +184,19 @@ class ConnectionManager {
         return true;
     }
 
-    // Disconnects, and runs the onDisconnected handler.
-    // Does nothing if the imp is in process of connecting.
-    //
-    // Parameters:
-    //      force           Force disconnect regardless of whether the device
-    //                      already tries to connect now.
-    //      flushTimeout    The timeout used for `server.flush` call.
-    //
-    // Returns:         this
+    /**
+     * Disconnects, and runs the onDisconnected handler.
+     * Does nothing if the imp is in process of connecting.
+     *
+     * @param {boolean} [force = false]                  - Forces disconnect regardless of whether the device
+     *                                                   is trying to connect or not.
+     * @param {double} [flushTimeout = CM_FLUSH_TIMEOUT] - The timeout used for `server.flush` call. 
+     *                                                   If the parameter is equal to -1, no flush is performed.
+     *                                                   The parameter is optional and is equal to *CM_FLUSH_TIMEOUT* 
+     *                                                   (30 seconds) by default.
+     * @return {boolean} `true` if an action (callback invocation, disconnect or something else) 
+     *                   was taken, `false` otherwise (the call was ignored for a reason).
+     */
     function disconnect(force = false, flushTimeout = CM_FLUSH_TIMEOUT) {
         if (force) {
             _connecting = false;
@@ -208,8 +212,11 @@ class ConnectionManager {
             return true;
         }
 
+        // Flush if timeout is not -1
+        if (flushTimeout >= 0) {
+            server.flush(flushTimeout);
+        }
         // Disconnect
-        server.flush(flushTimeout);
         server.disconnect();
 
         // Set the flag
