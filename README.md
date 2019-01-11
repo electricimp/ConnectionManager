@@ -1,10 +1,10 @@
-# ConnectionManager 3.0.0 #
+# ConnectionManager 3.1.0 #
 
 The ConnectionManager class is an Electric Imp device-side library created to simplify connect and disconnect flows.
 
 **Note** If you are using ConnectionManager in your code, you should ensure that you *never* call  [**server.connect()**](https://developer.electricimp.com/api/server/connect) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect). Instead you should only use ConnectionManager’s *connect()* and *disconnect()* methods.
 
-**To add this library to your project, add** `#require "ConnectionManager.lib.nut:3.0.0"` **to the top of your device code.**
+**To add this library to your project, add** `#require "ConnectionManager.lib.nut:3.1.0"` **to the top of your device code.**
 
 ## Class Usage ##
 
@@ -25,7 +25,7 @@ ConnectionManager can be instantiated with an optional table of settings that mo
 | *ackTimeout* | 1.0 | A float value indicating the maximum time (in seconds) allowed for the server to acknowledge receipt of data |
 
 ```squirrel
-#require "ConnectionManager.lib.nut:3.0.0"
+#require "ConnectionManager.lib.nut:3.1.0"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically aggressively try to reconnect on disconnect
