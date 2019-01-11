@@ -31,6 +31,8 @@ const CM_START_NO_ACTION     = 0;
 const CM_START_CONNECTED     = 1;
 const CM_START_DISCONNECTED  = 2;
 
+const CM_DEFAULT_CALLBACK_ID = "DEFAULT_INDEX";
+
 class ConnectionManager {
 
     static VERSION = "3.1.0";
@@ -56,6 +58,10 @@ class ConnectionManager {
     _logs               = null;
 
     constructor(settings = {}) {
+        _onConnect    = {};
+        _onTimeout    = {};
+        _onDisconnect = {};
+
         // Grab settings
         _checkTimeout       = ("checkTimeout"    in settings) ? settings.checkTimeout    : 5;
         _connectTimeout     = ("connectTimeout"  in settings) ? settings.connectTimeout  : 60;
@@ -96,18 +102,28 @@ class ConnectionManager {
 
     }
 
-    // Sets an onConnect handler that fires everytime we connect. Passing
-    // null to this function removes the onConnect handler
-    //
-    // Parameters:
-    //      callback:   The onConnect handler (no parameters)
-    //
-    // Returns:         this
-    function onConnect(callback) {
-        _onConnect = callback;
-
+    /**
+     * Sets an onConnect handler that fires everytime we connect.
+     * Passing null to this function removes the corresponding onConnect handler.
+     * ConnectionManager allows for multiple onConnect callbacks to be registered.
+     * Each of the callbacks should have a unique string identifier passed
+     * as a second parameter to the `onConnect` setter.
+     *
+     * @param {onConnectCallback} callback - The onConnect handler
+     * @param {string} [callbackId = CM_DEFAULT_CALLBACK_NAME] - the callback identifier.
+     *
+     * @return {ConnectionManager} this.
+     */
+    /**
+     * Callback to be executed when device successfully connects to the cloud.
+     * It has no parameters.
+     * @callback onConnectCallback
+     */
+    function onConnect(callback, callbackId = CM_DEFAULT_CALLBACK_ID) {
+        _onConnect[callbackId] <- callback;
         return this;
     }
+
 
     // Sets an onTimeout handler that fires when a connection attempt fails. Passing
     // null to this function removes the onTimeout handler
@@ -116,23 +132,51 @@ class ConnectionManager {
     //      callback:   The onTimeout handler (no parameters)
     //
     // Returns:         this
-    function onTimeout(callback) {
-        _onTimeout = callback;
+
+
+    /**
+     * Sets an onTimeout handler that fires when a connection attempt fails.
+     * Passing null to this function removes the corresponding onConnect handler.
+     * ConnectionManager allows for multiple onConnect callbacks to be registered.
+     * Each of the callbacks should have a unique string identifier passed
+     * as a second parameter to the `onTimeout` setter.
+     *
+     * @param {onTimeoutCallback} callback - The onTimeout handler
+     * @param {string} [callbackId = CM_DEFAULT_CALLBACK_NAME] - the callback identifier.
+     *
+     * @return {ConnectionManager} this.
+     */
+    /**
+     * Callback to be executed when a connection attempt fails.
+     * The callback has no parameters.
+     * @callback onTimeoutCallback
+     */
+    function onTimeout(callback, callbackId = CM_DEFAULT_CALLBACK_ID) {
+        _onTimeout[callbackId] <- callback;
 
         return this;
     }
 
-    // Sets a onDisconnect handler that fires everytime we disconnect. Passing
-    // null to this function removes the onDisconnect handler
-    //
-    // Parameters:
-    //      callback:   The onDisconnectHandler with 1 parameter:
-    //        expected    True - when onDisconnect was called because of a disconnect()
-    //                    False - otherwise
-    //
-    // Returns:         this
+    /**
+     * Sets a onDisconnect handler that fires everytime we disconnect.
+     * Passing null to this function removes the corresponding onConnect handler.
+     * ConnectionManager allows for multiple onConnect callbacks to be registered.
+     * Each of the callbacks should have a unique string identifier passed
+     * as a second parameter to the `onDisconnect` setter.
+     *
+     * @param {onDisconnectCallback} callback - The onDisconnectHandler
+     * @param {string} [callbackId = CM_DEFAULT_CALLBACK_NAME] - the callback identifier.
+     *
+     * @return {ConnectionManager} this.
+     */
+    /**
+     * Callback to be executed when a connection attempt fails.
+     * @callback onDisconnectCallback
+     * @param {boolean} expected - is `true` when onDisconnect was called because of a disconnect()
+     *                             is `false` otherwise
+     */
     function onDisconnect(callback) {
-        _onDisconnect = callback;
+        _onDisconnect[callbackId] <- callback;
 
         return this;
     }
@@ -190,11 +234,11 @@ class ConnectionManager {
      *
      * @param {boolean} [force = false]                  - Forces disconnect regardless of whether the device
      *                                                   is trying to connect or not.
-     * @param {double} [flushTimeout = CM_FLUSH_TIMEOUT] - The timeout used for `server.flush` call. 
+     * @param {double} [flushTimeout = CM_FLUSH_TIMEOUT] - The timeout used for `server.flush` call.
      *                                                   If the parameter is equal to -1, no flush is performed.
-     *                                                   The parameter is optional and is equal to *CM_FLUSH_TIMEOUT* 
+     *                                                   The parameter is optional and is equal to *CM_FLUSH_TIMEOUT*
      *                                                   (30 seconds) by default.
-     * @return {boolean} `true` if an action (callback invocation, disconnect or something else) 
+     * @return {boolean} `true` if an action (callback invocation, disconnect or something else)
      *                   was taken, `false` otherwise (the call was ignored for a reason).
      */
     function disconnect(force = false, flushTimeout = CM_FLUSH_TIMEOUT) {
@@ -338,8 +382,13 @@ class ConnectionManager {
         }
 
         // Run the global onConnected Handler if it exists
-        if (_onConnect != null) {
-            imp.wakeup(0, function() { _onConnect(); }.bindenv(this));
+        if (_onConnect != null && _onConnect.len()) {
+            imp.wakeup(0, function() {
+                // Invoke all the callbacks in the loop
+                foreach (id, callback in _onConnect) {
+                    callback && callback();
+                }
+            }.bindenv(this));
         }
 
         _processQueue();
@@ -353,7 +402,11 @@ class ConnectionManager {
 
         // Run the global onDisconnected Handler if it exists
         if (_onDisconnect != null) {
-            imp.wakeup(0, function() { _onDisconnect(expected); }.bindenv(this));
+            imp.wakeup(0, function() {
+                foreach (id, callback in _onDisconnect) {
+                    callback && callback(expected);
+                }
+            }.bindenv(this));
         }
 
         if (_stayConnected) {
@@ -374,7 +427,12 @@ class ConnectionManager {
         _connecting = false;
         _connected = false;
         if (_onTimeout != null) {
-            imp.wakeup(0, function() { _onTimeout(); }.bindenv(this));
+            imp.wakeup(0, function() {
+                // Invoke all the callbacks
+                foreach (id, callback in _onTimeout) {
+                    callback && callback();
+                }
+            }.bindenv(this));
         }
 
         if (_retryOnTimeout) {
