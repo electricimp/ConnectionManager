@@ -103,9 +103,11 @@ cm.onDisconnect(function(expected) {
 });
 ```
 
-### onConnect(*callback*) ###
+### onConnect(*callback*[, callbackId]) ###
 
 This method assigns a callback function to the onConnect event. The onConnect event will fire every time the connection state changes from offline to online, or when ConnectionManager’s *connect()* method is called (even if the device is already connected).
+
+ConnectionManager allows for multiple onConnect callbacks to be registered. Each of the callbacks should have a unique string identifier passed as a second parameter to the `onConnect` setter. If the `callbackId` is not specified, a default value id value is used. Calling the setter function multiple times with the same `callbackId` overwrites the previously set callback.
 
 The callback function has no parameters.
 

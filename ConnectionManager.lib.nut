@@ -110,7 +110,8 @@ class ConnectionManager {
      * as a second parameter to the `onConnect` setter.
      *
      * @param {onConnectCallback} callback - The onConnect handler
-     * @param {string} [callbackId = CM_DEFAULT_CALLBACK_NAME] - the callback identifier.
+     * @param {string} [callbackId = CM_DEFAULT_CALLBACK_NAME] - The callback identifier,
+     *                               an optional parameter. If not specified, a default value is used.
      *
      * @return {ConnectionManager} this.
      */
