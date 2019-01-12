@@ -85,9 +85,11 @@ if (!cm.isConnected()) {
 }
 ```
 
-### onDisconnect(*callback*) ###
+### onDisconnect(*callback*[, callbackId]) ###
 
 This method assigns a callback function to the onDisconnect event. The onDisconnect event will fire every time the connection state changes from online to offline, or when ConnectionManager’s *disconnect()* method is called (even if the device is already disconnected).
+
+ConnectionManager allows for multiple onDisconnect callbacks to be registered. Each of the callbacks should have a unique string identifier passed as a second parameter to the `onDisconnect` callback setter. If the `callbackId` is not specified, a default value id value is used. Calling the setter function multiple times with the same (or omitted) `callbackId` overwrites the previously set callback.
 
 The callback method takes a single parameter, *expected*, which is `true` when the onDisconnect event fired due to *disconnect()* being called, and `false` otherwise (an unexpected state change from connected to disconnected).
 
@@ -107,7 +109,7 @@ cm.onDisconnect(function(expected) {
 
 This method assigns a callback function to the onConnect event. The onConnect event will fire every time the connection state changes from offline to online, or when ConnectionManager’s *connect()* method is called (even if the device is already connected).
 
-ConnectionManager allows for multiple onConnect callbacks to be registered. Each of the callbacks should have a unique string identifier passed as a second parameter to the `onConnect` setter. If the `callbackId` is not specified, a default value id value is used. Calling the setter function multiple times with the same `callbackId` overwrites the previously set callback.
+ConnectionManager allows for multiple onConnect callbacks to be registered. Each of the callbacks should have a unique string identifier passed as a second parameter to the `onConnect` callback setter. If the `callbackId` is not specified, a default value id value is used. Calling the setter function multiple times with the same (or omitted) `callbackId` overwrites the previously set callback.
 
 The callback function has no parameters.
 
@@ -118,9 +120,11 @@ cm.onConnect(function() {
 });
 ```
 
-### onTimeout(callback) ###
+### onTimeout(callback[, callbackId]) ###
 
 This method assigns a callback function to the onTimeout event. The onTimeout event will fire every time the device attempts to connect but does not succeed.
+
+ConnectionManager allows for multiple onTimeout callbacks to be registered. Each of the callbacks should have a unique string identifier passed as a second parameter to the `onTimeout` callback setter. If the `callbackId` is not specified, a default value id value is used. Calling the setter function multiple times with the same (or omitted) `callbackId` overwrites the previously set callback.
 
 The callback function has no parameters.
 
