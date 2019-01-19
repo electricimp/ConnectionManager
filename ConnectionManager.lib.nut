@@ -31,7 +31,7 @@ const CM_START_NO_ACTION     = 0;
 const CM_START_CONNECTED     = 1;
 const CM_START_DISCONNECTED  = 2;
 
-const CM_DEFAULT_CALLBACK_ID = "DEFAULT_INDEX";
+const CM_DEFAULT_CALLBACK_ID = "DEFAULT_CB_ID";
 
 class ConnectionManager {
 
@@ -377,13 +377,15 @@ class ConnectionManager {
         }
 
         // Run the global onConnected Handler if it exists
-        if (_onConnect != null && _onConnect.len()) {
-            imp.wakeup(0, function() {
+        if (_onConnect != null) {
                 // Invoke all the callbacks in the loop
-                foreach (id, callback in _onConnect) {
-                    callback && callback();
-                }
-            }.bindenv(this));
+            foreach (id, callback in _onConnect) {
+                callback                            &&
+                    typeof callback == "function"   &&
+                    imp.wakeup(0, function() {
+                        callback();
+                    }.bindenv(this));
+            }
         }
 
         _processQueue();
