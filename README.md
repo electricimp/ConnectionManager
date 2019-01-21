@@ -2,7 +2,7 @@
 
 The ConnectionManager class is an Electric Imp device-side library created to simplify connect and disconnect flows.
 
-**Note** If you are using ConnectionManager in your code, you should ensure that you *never* call  [**server.connect()**](https://developer.electricimp.com/api/server/connect) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect). Instead you should only use ConnectionManager’s *connect()* and *disconnect()* methods.
+**Note** If you are using ConnectionManager in your code, you should ensure that you *never* call [**server.connect()**](https://developer.electricimp.com/api/server/connect) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect). Instead you should only use ConnectionManager’s [*connect()*](#connect) and [*disconnect()*](#disconnectforce-flushtimeout) methods.
 
 **To include this library in your project, add** `#require "ConnectionManager.lib.nut:3.1.0"` **at the top of your device code.**
 
@@ -86,7 +86,7 @@ cm.setBlinkUpBehavior(CM_BLINK_ON_CONNECT);
 
 ### isConnected() ###
 
-This method can be used to determine the value of ConnectionManager’s internal connection state flag (ie. whether or not the imp is connected). This flag is updated every five seconds, or as set by the *checkTimeout* setting in the constructor.
+This method can be used to determine the value of ConnectionManager’s internal connection state flag (ie. whether or not the imp is connected). This flag is updated every five seconds, or as set by the *checkTimeout* setting in [the constructor](#constructor-connectionmanagersettings).
 
 #### Returns ####
 
