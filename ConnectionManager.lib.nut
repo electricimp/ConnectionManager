@@ -35,7 +35,7 @@ const CM_DEFAULT_CALLBACK_ID = "DEFAULT_CB_ID";
 
 class ConnectionManager {
 
-    static VERSION = "3.1.0";
+    static VERSION = "3.1.1";
 
     // Settings
     _connectTimeout     = null;
