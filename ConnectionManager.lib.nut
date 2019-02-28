@@ -363,7 +363,6 @@ class ConnectionManager {
 
     // Runs whenever we connect or call connect()
     function _onConnectedFlow() {
-
         // Set the BlinkUp State
         _setBlinkUpState();
 
@@ -380,11 +379,15 @@ class ConnectionManager {
         if (_onConnect != null) {
                 // Invoke all the callbacks in the loop
             foreach (id, callback in _onConnect) {
+                local ctx = {
+                    "ctxId"        : id,
+                    "ctxCallback"  : callback
+                };
                 callback                            &&
                     typeof callback == "function"   &&
                     imp.wakeup(0, function() {
-                        callback();
-                    }.bindenv(this));
+                        ctxCallback();
+                    }.bindenv(ctx));
             }
         }
 
