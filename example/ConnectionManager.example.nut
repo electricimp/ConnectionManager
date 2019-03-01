@@ -23,7 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 
-#require "ConnectionManager.lib.nut:3.1.0"
+#require "ConnectionManager.lib.nut:3.1.1"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and starts connected.

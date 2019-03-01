@@ -35,7 +35,7 @@ const CM_DEFAULT_CALLBACK_ID = "DEFAULT_CB_ID";
 
 class ConnectionManager {
 
-    static VERSION = "3.1.0";
+    static VERSION = "3.1.1";
 
     // Settings
     _connectTimeout     = null;
@@ -361,9 +361,25 @@ class ConnectionManager {
         }
     }
 
+    function _invokeCallbacks(callbacks, arg = null) {
+        foreach (id, clbk in callbacks) {
+            local ctx = {
+                "arg"      : arg,
+                "ctxClbk"  : clbk
+            };
+            if (clbk && typeof clbk == "function") {
+                // TODO: we assume that null is not a valid value of the argument, it's null only if it's unset.
+                if (arg == null) {
+                    imp.wakeup(0, function() {ctxClbk();}.bindenv(ctx));
+                } else {
+                    imp.wakeup(0, function() {ctxClbk(arg);}.bindenv(ctx));
+                }
+            }
+        }
+    }
+
     // Runs whenever we connect or call connect()
     function _onConnectedFlow() {
-
         // Set the BlinkUp State
         _setBlinkUpState();
 
@@ -378,14 +394,8 @@ class ConnectionManager {
 
         // Run the global onConnected Handler if it exists
         if (_onConnect != null) {
-                // Invoke all the callbacks in the loop
-            foreach (id, callback in _onConnect) {
-                callback                            &&
-                    typeof callback == "function"   &&
-                    imp.wakeup(0, function() {
-                        callback();
-                    }.bindenv(this));
-            }
+            // Invoke all the callbacks in the loop
+            _invokeCallbacks(_onConnect);
         }
 
         _processQueue();
@@ -399,11 +409,7 @@ class ConnectionManager {
 
         // Run the global onDisconnected Handler if it exists
         if (_onDisconnect != null) {
-            imp.wakeup(0, function() {
-                foreach (id, callback in _onDisconnect) {
-                    callback && callback(expected);
-                }
-            }.bindenv(this));
+            _invokeCallbacks(_onDisconnect, expected);
         }
 
         if (_stayConnected) {
@@ -424,12 +430,7 @@ class ConnectionManager {
         _connecting = false;
         _connected = false;
         if (_onTimeout != null) {
-            imp.wakeup(0, function() {
-                // Invoke all the callbacks
-                foreach (id, callback in _onTimeout) {
-                    callback && callback();
-                }
-            }.bindenv(this));
+            _invokeCallbacks(_onTimeout);
         }
 
         if (_retryOnTimeout) {
