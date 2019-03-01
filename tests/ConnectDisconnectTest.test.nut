@@ -30,7 +30,7 @@ class ConnectDisconnectTest extends CommonTest {
     function setUp() {
         _setUp();
     }
-    
+
     /*
     * disconnects and connects device using CM
     *
@@ -139,7 +139,7 @@ class ConnectDisconnectTest extends CommonTest {
                 assertTrue(!server.isconnected(), "should NOT be connected!");
 
                 _cm.onConnect(function() {
-                    assertEqual(counter, 2, "counter should be 2 now");
+                    assertEqual(counter, 2, "counter should be 2 now, while it is: " + counter);
                     counter++;
                     resolve();
                 }.bindenv(this));
