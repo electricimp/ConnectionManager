@@ -6,6 +6,8 @@ The ConnectionManager class is an Electric Imp device-side library created to si
 
 **To include this library in your project, add** `#require "ConnectionManager.lib.nut:3.1.1"` **at the top of your device code.**
 
+![Build Status](https://cse-ci.electricimp.com/app/rest/builds/buildType:(id:ConnectionManager_BuildAndTest)/statusIcon)
+
 ## Class Usage ##
 
 ### Constructor: ConnectionManager(*[settings]*) ###
