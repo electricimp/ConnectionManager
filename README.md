@@ -59,7 +59,7 @@ The *blinkupBehavior* flag modifies when ConnectionManager enables the BlinkUp�
 - *CM_BLINK_ALWAYS* will ensure the BlinkUp circuit is always active.
 - *CM_BLINK_NEVER* will ensure the BlinkUp circuit is never active.
 
-**Note** impOS™ *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot.
+**Important** impOS™ 40 *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot. However, impOS 42 changes this behavior: BlinkUp is disabled as soon as impOS is asked to do so, even within the initial 60-second period. If your code disables BlinkUp early, end-users may have as little as ten seconds to perform BlinkUp. Please see the [**imp.enableblinkup()**](https://developer.electricimp.com/api/imp/enableblinkup) documentation for more guidance.
 
 #### Setting: ackTimeout ####
 
