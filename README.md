@@ -1,10 +1,10 @@
-# ConnectionManager 3.1.1 #
+# ConnectionManager 3.1.2 #
 
 The ConnectionManager class is an Electric Imp device-side library created to simplify connect and disconnect flows.
 
 **Note** If you are using ConnectionManager in your code, you should ensure that you *never* call [**server.connect()**](https://developer.electricimp.com/api/server/connect) or [**server.disconnect()**](https://developer.electricimp.com/api/server/disconnect). Instead you should only use ConnectionManager’s [*connect()*](#connect) and [*disconnect()*](#disconnectforce-flushtimeout) methods.
 
-**To include this library in your project, add** `#require "ConnectionManager.lib.nut:3.1.1"` **at the top of your device code.**
+**To include this library in your project, add** `#require "ConnectionManager.lib.nut:3.1.2"` **at the top of your device code.**
 
 ![Build Status](https://cse-ci.electricimp.com/app/rest/builds/buildType:(id:ConnectionManager_BuildAndTest)/statusIcon)
 
@@ -29,7 +29,7 @@ ConnectionManager can be instantiated with an optional table of settings that mo
 #### Example ####
 
 ```squirrel
-#require "ConnectionManager.lib.nut:3.1.1"
+#require "ConnectionManager.lib.nut:3.1.2"
 
 // Instantiate ConnectionManager so BlinkUp is always enabled,
 // and we automatically aggressively try to reconnect on disconnect
@@ -52,7 +52,7 @@ The *startBehavior* flag modifies what action ConnectionManager takes when initi
 
 #### Setting: blinkupBehavior ####
 
-The *blinkupBehavior* flag modifies when ConnectionManager enables the BlinkUp™ circuit (using [**imp.enableblinkup()**](https://developer.electricimp.com/api/imp/enableblinkup):
+The *blinkupBehavior* flag modifies when ConnectionManager enables the BlinkUp™ circuit (using [**imp.enableblinkup()**](https://developer.electricimp.com/api/imp/enableblinkup)):
 
 - *CM_BLINK_ON_DISCONNECT* will enable BlinkUp while the imp is disconnected. This is the default value.
 - *CM_BLINK_ON_CONNECT* will enable BlinkUp while the imp is connected.
@@ -60,6 +60,13 @@ The *blinkupBehavior* flag modifies when ConnectionManager enables the BlinkUp�
 - *CM_BLINK_NEVER* will ensure the BlinkUp circuit is never active.
 
 **Important** impOS™ 40 *always* enables the BlinkUp circuit for the first 60 seconds after a cold boot to ensure the imp never enters an unrecoverable state. As a result, regardless of what *blinkupBehavior* flag is set, the imp will enable the BlinkUp circuit for 60 seconds after a cold boot. However, impOS 42 changes this behavior: BlinkUp is disabled as soon as impOS is asked to do so, even within the initial 60-second period. If your code disables BlinkUp early, end-users may have as little as ten seconds to perform BlinkUp. Please see the [**imp.enableblinkup()**](https://developer.electricimp.com/api/imp/enableblinkup) documentation for more guidance.
+
+From version 3.2.0, if your code sets `CM_BLINK_NEVER`, this will be applied after 30s, not immediately, if all of the following conditions are true:
+- The host impOS is version 42 or above.
+- The imp was started cold.
+- The imp is disconnected.
+
+This is to ensure that users who have configured devices with incorrect credentials can recover by a fresh BlinkUp within 30s of a power-cycle.
 
 #### Setting: ackTimeout ####
 
@@ -117,7 +124,7 @@ Pass `null` into *callback* to clear the onDisconnect callback for the specified
 #### Parameters ####
 
 | Parameter | Data&nbsp;Type | Required | Description |
-| --- | --- | --- | --- | 
+| --- | --- | --- | --- |
 | *callback* | Function | Yes | Called when ConnectionManager’s connection state changes from online to offline. See [below for details](#the-ondisconnect-callback) |
 | *callbackID* | String | No | Optional identifier |
 
@@ -154,7 +161,7 @@ Pass `null` into *callback* to clear the onConnect callback for the specified (o
 #### Parameters ####
 
 | Parameter | Data&nbsp;Type | Required | Description |
-| --- | --- | --- | --- | 
+| --- | --- | --- | --- |
 | *callback* | Function | Yes | Called when ConnectionManager’s connection state changes from offline to online. The callback function has no parameters |
 | *callbackID* | String | No | Optional identifier |
 
@@ -182,7 +189,7 @@ Pass `null` into *callback* to clear the onTimeout callback for the specified (o
 #### Parameters ####
 
 | Parameter | Data&nbsp;Type | Required | Description |
-| --- | --- | --- | --- | 
+| --- | --- | --- | --- |
 | *callback* | Function | Yes | Called when the device attempts to connect but fails to do so. The callback function has no parameters |
 | *callbackID* | String | No | Optional identifier |
 
@@ -206,7 +213,7 @@ This method queues a function to run the next time the device connects for whate
 #### Parameters ####
 
 | Parameter | Data&nbsp;Type | Required | Description |
-| --- | --- | --- | --- | 
+| --- | --- | --- | --- |
 | *callback* | Function | Yes | Called when the device next connects, or is connected already. The callback function has no parameters |
 
 #### Returns ####
@@ -241,7 +248,7 @@ This method tells the device to connect, run the supplied callback function, and
 #### Parameters ####
 
 | Parameter | Data&nbsp;Type | Required | Description |
-| --- | --- | --- | --- | 
+| --- | --- | --- | --- |
 | *callback* | Function | Yes | Called when the device has connected, or is connected already. The callback function has no parameters |
 
 #### Returns ####
@@ -299,7 +306,7 @@ If a connection attempt is in process, *disconnect()* will not attempt to discon
 #### Parameters ####
 
 | Parameter | Data&nbsp;Type | Required | Description |
-| --- | --- | --- | --- | 
+| --- | --- | --- | --- |
 | *force* | Boolean | No | Force ConnectionManager to disconnect regardless of the connection status (ie. whether it’s in progress or not). Default: `false` |
 | *flushTimeout* | Integer or float | No | The timeout value used for [**server.flush()**](https://developer.electricimp.com/api/server/flush) calls. If set to -1, no flush is performed. Default: *CM_FLUSH_TIMEOUT* (30 seconds) |
 
@@ -360,7 +367,7 @@ Alternatively, you can create an `.imptest-builder` file with *CM_TEST_SSID* and
 ```JSON
 { "CM_TEST_SSID": "<YOUR_WIFI_SSID>",
   "CM_TEST_PWD" : "<YOUR_WIFI_PASSWORD>" }
-``` 
+```
 
 ## License ##
 

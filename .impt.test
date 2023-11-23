@@ -1,7 +1,6 @@
 {
-  "deviceGroupId": "d1bcc23e-2b19-83c3-51c3-170868e9b62a",
-  "deviceGroupName" : "impFarm L",
-  "timeout": 90,
+  "deviceGroupId": "aaf50bad-6522-2e27-4b5b-c40999cddf7a",
+  "timeout": 30,
   "stopOnFail": false,
   "allowDisconnect": true,
   "builderCache": false,

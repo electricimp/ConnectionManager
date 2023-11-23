@@ -1,6 +1,7 @@
 // MIT License
 
-// Copyright 2015-2019 Electric Imp
+// Copyright 2015-19 Electric Imp
+// Copyright 2020-23 KORE Wireless
 
 // SPDX-License-Identifier: MIT
 
@@ -35,32 +36,42 @@ const CM_DEFAULT_CALLBACK_ID = "DEFAULT_CB_ID";
 
 class ConnectionManager {
 
-    static VERSION = "3.1.1";
+    static VERSION = "3.2.0";
 
     // Settings
-    _connectTimeout     = null;
-    _checkTimeout       = null;
-    _stayConnected      = null;
-    _blinkupBehavior    = null;
-    _retryOnTimeout     = null;
+    _connectTimeout                 = null;
+    _checkTimeout                   = null;
+    _stayConnected                  = null;
+    _blinkupBehavior                = null;
+    _retryOnTimeout                 = null;
 
     // Global Handlers
-    _onConnect          = null;
-    _onTimeout          = null;
-    _onDisconnect       = null;
+    _onConnect                      = null;
+    _onTimeout                      = null;
+    _onDisconnect                   = null;
 
     // Connection State
-    _connected          = null;
-    _connecting         = null;
+    _connected                      = null;
+    _connecting                     = null;
 
     // The onConnected task queue and logs
-    _queue              = null;
-    _logs               = null;
+    _queue                          = null;
+    _logs                           = null;
+
+    // FROM 3.2.0
+    _impOSVersion                   = 0;
+    _impOS42ColdBootBlinkUpPeriod   = 30;
 
     constructor(settings = {}) {
         _onConnect    = {};
         _onTimeout    = {};
         _onDisconnect = {};
+
+        // FROM 3.2.0
+        // Get impOS version
+        local parts = split(imp.getsoftwareversion(), " ");
+        local ver = split(parts[2], "-");
+        _impOSVersion = ver[1].tofloat();
 
         // Grab settings
         _checkTimeout       = ("checkTimeout"    in settings) ? settings.checkTimeout    : 5;
@@ -462,8 +473,25 @@ class ConnectionManager {
             imp.enableblinkup(true);
             return;
         }
+
         // If it's set to never blinkup
         if (_blinkupBehavior == CM_BLINK_NEVER) {
+            // This is dangerous on impOS 42 after a cold boot with unchanged app code:
+            // the user will have only 10s to be sure of BlinkUp availability if the
+            // connection attempt fails (eg. wrong WiFi credentials applied or missing router).
+            // So for 3.2.0, we impose a 30s availability period in this case.
+            if (_impOSVersion >= 42.0) {
+                if (!("active" in imp.net.info()) &&                // Disconnected
+                    hardware.wakereason() == WAKEREASON_POWER_ON && // After a cold boot
+                    hardware.millis() < 30000) {                    // Within 30s of boot
+                    local remainder = _impOS42ColdBootBlinkUpPeriod - (hardware.millis() / 1000);
+                    imp.wakeup(remainder, function() {
+                        imp.enableblinkup(false);
+                    });
+                    return;
+                }
+            }
+
             imp.enableblinkup(false);
             return;
         }
